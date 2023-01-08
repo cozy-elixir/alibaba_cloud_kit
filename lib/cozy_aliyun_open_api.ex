@@ -1,6 +1,6 @@
 defmodule CozyAliyunOpenAPI do
   @moduledoc """
-  Documentation for `CozyAliyunOpenAPI`.
+  An SDK builder for Aliyun OpenAPI.
 
   ## API Styles
 
@@ -9,8 +9,6 @@ defmodule CozyAliyunOpenAPI do
   * RPC
   * ROA
   * OSS
-
-  The `CozyAliyunOpenAPI.Specs.*` modules will try to encapsulate implementation details.
 
   ## Authentication & Authorization
 

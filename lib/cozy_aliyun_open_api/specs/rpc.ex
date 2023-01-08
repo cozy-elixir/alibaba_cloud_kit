@@ -16,7 +16,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
           access_key_secret: "..."
         })
 
-      RPC.new!(%{
+      RPC.new!(config, %{
         method: :post,
         protocol: :https,
         endpoint: "...",
