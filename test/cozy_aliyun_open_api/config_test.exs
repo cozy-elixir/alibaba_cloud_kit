@@ -4,9 +4,8 @@ defmodule CozyAliyunOpenAPI.ConfigTest do
 
   describe "new!/1" do
     test "creates a %Config{} struct" do
-      assert %Config{endpoint: _, access_key_id: _, access_key_secret: _} =
+      assert %Config{access_key_id: _, access_key_secret: _} =
                Config.new!(%{
-                 endpoint: "...",
                  access_key_id: "...",
                  access_key_secret: "..."
                })
@@ -14,7 +13,7 @@ defmodule CozyAliyunOpenAPI.ConfigTest do
 
     test "raises ArgumentError when required keys are missing" do
       assert_raise ArgumentError,
-                   "config :endpoint, :access_key_id, :access_key_secret are required",
+                   "config :access_key_id, :access_key_secret are required",
                    fn ->
                      Config.new!(%{})
                    end
