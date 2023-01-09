@@ -1,4 +1,6 @@
 defmodule CozyAliyunOpenAPI.Application do
+  @moduledoc false
+
   use Application
 
   require Logger

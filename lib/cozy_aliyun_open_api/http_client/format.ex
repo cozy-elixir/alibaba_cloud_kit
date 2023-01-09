@@ -1,4 +1,6 @@
 defmodule CozyAliyunOpenAPI.HTTPClient.Format do
+  @moduledoc false
+
   @doc """
   Converts XML string to a map.
   """
