@@ -89,11 +89,11 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
   end
 
   @doc """
-  Parses an URL, and takes the scheme, host, port.
+  Parses an URL, then takes the scheme, host, port and path.
   """
   def parse_base_url(url) when is_binary(url) do
     url
     |> URI.parse()
-    |> Map.take([:scheme, :host, :port])
+    |> Map.take([:scheme, :host, :port, :path])
   end
 end

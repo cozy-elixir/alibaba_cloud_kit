@@ -18,8 +18,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
 
       RPC.new!(config, %{
         method: :post,
-        protocol: :https,
-        endpoint: "...",
+        endpoint: "https://example.com/",
         shared_params: %{
           "Action" => "SingleSendMail",
           "Version" => "2015-11-23",
@@ -38,19 +37,16 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
 
   @enforce_keys [
     :method,
-    :protocol,
     :endpoint,
     :shared_params,
     :params
   ]
   defstruct method: nil,
-            protocol: nil,
             endpoint: nil,
             shared_params: %{},
             params: %{}
 
   @type method() :: :get | :post
-  @type protocol() :: :http | :https
   @type endpoint() :: String.t()
   @type shared_params() :: %{
           optional(name :: String.t()) => value :: boolean() | number() | String.t()
@@ -63,7 +59,6 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
 
   @type spec_config() :: %{
           method: method(),
-          protocol: protocol(),
           endpoint: endpoint(),
           shared_params: shared_params(),
           params: params()
@@ -71,7 +66,6 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
 
   @type t :: %__MODULE__{
           method: method(),
-          protocol: protocol(),
           endpoint: endpoint(),
           shared_params: shared_params(),
           params: params()
@@ -81,9 +75,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
   def new!(%Config{} = config, %{} = spec_config) do
     spec_config
     |> validate_method!()
-    |> validate_protocol!()
     |> validate_endpoint!()
-    |> sanitize_endpoint!()
     |> as_struct!()
     |> put_shared_params!(config)
     |> put_signature(config)
@@ -98,26 +90,12 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
     raise ArgumentError, "key :method should be one of #{inspect(@valid_methods)}"
   end
 
-  @valid_protocols [:http, :https]
-  defp validate_protocol!(%{protocol: protocol} = spec_config)
-       when protocol in @valid_protocols do
-    spec_config
-  end
-
-  defp validate_protocol!(_spec_config) do
-    raise ArgumentError, "key :protocol should be one of #{inspect(@valid_protocols)}"
-  end
-
   defp validate_endpoint!(%{endpoint: endpoint} = spec_config) when is_binary(endpoint) do
     spec_config
   end
 
   defp validate_endpoint!(_spec_config) do
     raise ArgumentError, "key :endpoint should be provided"
-  end
-
-  defp sanitize_endpoint!(spec_config) do
-    Map.update!(spec_config, :endpoint, &String.trim(&1, "/"))
   end
 
   defp as_struct!(spec_config) do
@@ -205,7 +183,7 @@ defimpl HTTPRequest.Transform, for: RPC do
       params: params
     } = rpc
 
-    %{scheme: scheme, host: host, port: port} = HTTPRequest.parse_base_url("https://#{endpoint}")
+    %{scheme: scheme, host: host, port: port} = HTTPRequest.parse_base_url(endpoint)
 
     HTTPRequest.new!(%{
       scheme: scheme,
@@ -225,7 +203,7 @@ defimpl HTTPRequest.Transform, for: RPC do
       params: params
     } = rpc
 
-    %{scheme: scheme, host: host, port: port} = HTTPRequest.parse_base_url("https://#{endpoint}")
+    %{scheme: scheme, host: host, port: port} = HTTPRequest.parse_base_url(endpoint)
 
     HTTPRequest.new!(%{
       scheme: scheme,

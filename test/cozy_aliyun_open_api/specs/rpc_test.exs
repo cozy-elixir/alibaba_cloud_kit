@@ -15,8 +15,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPCTest do
 
   @example_spec_config %{
     method: :post,
-    protocol: :https,
-    endpoint: "example.com",
+    endpoint: "https://example.com",
     shared_params: %{
       "Action" => "SingleSendMail",
       "Version" => "2015-11-23",
@@ -51,16 +50,6 @@ defmodule CozyAliyunOpenAPI.Specs.RPCTest do
 
       assert_raise ArgumentError, "key :method should be one of [:get, :post]", fn ->
         RPC.new!(config, %{method: :bad_method})
-      end
-    end
-
-    test "raises when protocol is invalid", %{config: config} do
-      assert_raise ArgumentError, "key :protocol should be one of [:http, :https]", fn ->
-        RPC.new!(config, %{method: :get})
-      end
-
-      assert_raise ArgumentError, "key :protocol should be one of [:http, :https]", fn ->
-        RPC.new!(config, %{method: :get, protocol: :bad_protocol})
       end
     end
 
