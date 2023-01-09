@@ -3,7 +3,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
   Describes an RPC style API.
 
   Read more at
-  [阿里云SDK > 调用机制 > RPC 调用机制](https://help.aliyun.com/document_detail/315526.html).
+  [阿里云 SDK > 调用机制 > RPC 调用机制](https://help.aliyun.com/document_detail/315526.html).
 
   ## Examples
 
