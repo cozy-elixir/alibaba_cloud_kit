@@ -16,15 +16,17 @@ defmodule CozyAliyunOpenAPI.MixProject do
     [
       extra_applications: [:logger, :crypto],
       mod: {CozyAliyunOpenAPI.Application, []},
-      env: [http_client: CozyAliyunOpenAPI.HTTPClient.Finch]
+      env: [json_library: Jason, http_client: CozyAliyunOpenAPI.HTTPClient.Finch]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, "~> 0.25", only: :dev, runtime: false},
-      {:finch, "~> 0.13", only: [:dev, :test]}
+      {:jason, "~> 1.0"},
+      {:sax_map, "~> 1.0", optional: true},
+      {:finch, "~> 0.13", only: [:dev, :test]},
+      {:ex_doc, "~> 0.25", only: :dev, runtime: false}
     ]
   end
 end

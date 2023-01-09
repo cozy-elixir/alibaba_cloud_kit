@@ -58,4 +58,7 @@ defmodule CozyAliyunOpenAPI do
   Personally, I recommend using private endpoints as much as possible.
 
   """
+
+  @doc false
+  def json_library, do: Application.fetch_env!(:cozy_aliyun_open_api, :json_library)
 end

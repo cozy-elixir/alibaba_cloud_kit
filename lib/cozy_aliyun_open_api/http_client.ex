@@ -15,6 +15,7 @@ defmodule CozyAliyunOpenAPI.HTTPClient do
   """
 
   alias CozyAliyunOpenAPI.HTTPRequest
+  alias __MODULE__.Format
 
   @type status :: pos_integer()
   @type headers :: [{binary(), binary()}]
@@ -53,8 +54,28 @@ defmodule CozyAliyunOpenAPI.HTTPClient do
   """
   @spec request(HTTPRequest.t()) :: response()
   def request(%HTTPRequest{} = req) do
-    http_client().request(req)
+    req
+    |> http_client().request()
+    |> maybe_to_map()
   end
+
+  defp maybe_to_map({:ok, status, headers, body} = response) do
+    case List.keyfind(headers, "content-type", 0) do
+      {"content-type", "application/xml" <> _} ->
+        {:ok, status, headers, body |> Format.convert_xml_to_map!()}
+
+      {"content-type", "text/xml" <> _} ->
+        {:ok, status, headers, body |> Format.convert_xml_to_map!()}
+
+      {"content-type", "application/json" <> _} ->
+        {:ok, status, headers, body |> Format.convert_json_to_map!()}
+
+      _ ->
+        response
+    end
+  end
+
+  defp maybe_to_map(response), do: response
 
   defp http_client do
     Application.fetch_env!(:cozy_aliyun_open_api, :http_client)

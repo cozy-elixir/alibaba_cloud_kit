@@ -19,9 +19,9 @@ defmodule CozyAliyunOpenAPITest do
 
   describe "use these modules" do
     test "for requesting an RPC style API", %{config: config} do
-      assert {:ok, 200, _, _} =
+      assert {:ok, 200, _, %{}} =
                RPC.new!(config, %{
-                 method: :get,
+                 method: :post,
                  endpoint: "https://ecs-cn-hangzhou.aliyuncs.com/",
                  shared_params: %{
                    "Action" => "DescribeInstanceStatus",
