@@ -26,7 +26,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
   @typedoc """
   Request scheme.
   """
-  @type scheme() :: :http | :https
+  @type scheme() :: String.t()
 
   @typedoc """
   Request host.
