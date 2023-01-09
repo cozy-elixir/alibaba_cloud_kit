@@ -1,14 +1,14 @@
 defmodule CozyAliyunOpenAPI.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
   @description "An SDK builder for Aliyun OpenAPI."
   @source_url "https://github.com/cozy-elixir/cozy_aliyun_open_api"
 
   def project do
     [
       app: :cozy_aliyun_open_api,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
