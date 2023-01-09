@@ -193,3 +193,48 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
     URI.encode(to_string(string), &URI.char_unreserved?/1)
   end
 end
+
+alias CozyAliyunOpenAPI.Specs.RPC
+alias CozyAliyunOpenAPI.HTTPRequest
+
+defimpl HTTPRequest.Transform, for: RPC do
+  def to_request(%RPC{method: :get = method} = rpc) do
+    %{
+      endpoint: endpoint,
+      shared_params: shared_params,
+      params: params
+    } = rpc
+
+    %{scheme: scheme, host: host, port: port} = HTTPRequest.parse_base_url("https://#{endpoint}")
+
+    HTTPRequest.new!(%{
+      scheme: scheme,
+      host: host,
+      port: port,
+      method: method,
+      path: "/",
+      query: Map.merge(shared_params, params),
+      body: nil
+    })
+  end
+
+  def to_request(%RPC{method: :post = method} = rpc) do
+    %{
+      endpoint: endpoint,
+      shared_params: shared_params,
+      params: params
+    } = rpc
+
+    %{scheme: scheme, host: host, port: port} = HTTPRequest.parse_base_url("https://#{endpoint}")
+
+    HTTPRequest.new!(%{
+      scheme: scheme,
+      host: host,
+      port: port,
+      method: method,
+      path: "/",
+      query: shared_params,
+      body: params
+    })
+  end
+end
