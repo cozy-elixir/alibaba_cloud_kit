@@ -65,7 +65,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPCTest do
   describe "CozyAliyunOpenAPI.Specs.RPC" do
     test "implements protocol - CozyAliyunOpenAPI.HTTPRequest.Transform", %{config: config} do
       rpc = RPC.new!(config, @example_spec_config)
-      assert %HTTPRequest{} = HTTPRequest.Transform.to_request(rpc)
+      assert %HTTPRequest{} = HTTPRequest.Transform.to_request!(rpc)
     end
   end
 end

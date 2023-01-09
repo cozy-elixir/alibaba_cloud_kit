@@ -74,11 +74,18 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
         }
 
   @doc """
-  Creates a HTTP request struct.
+  Creates an HTTP request struct.
   """
   def new!(%{} = args) do
     args
     |> as_struct!()
+  end
+
+  @doc """
+  Creates an HTTP request struct from specs.
+  """
+  def from_spec!(spec) do
+    __MODULE__.Transform.to_request!(spec)
   end
 
   defp as_struct!(map) do

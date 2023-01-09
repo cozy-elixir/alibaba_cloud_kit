@@ -176,7 +176,7 @@ alias CozyAliyunOpenAPI.Specs.RPC
 alias CozyAliyunOpenAPI.HTTPRequest
 
 defimpl HTTPRequest.Transform, for: RPC do
-  def to_request(%RPC{method: :get = method} = rpc) do
+  def to_request!(%RPC{method: :get = method} = rpc) do
     %{
       endpoint: endpoint,
       shared_params: shared_params,
@@ -196,7 +196,7 @@ defimpl HTTPRequest.Transform, for: RPC do
     })
   end
 
-  def to_request(%RPC{method: :post = method} = rpc) do
+  def to_request!(%RPC{method: :post = method} = rpc) do
     %{
       endpoint: endpoint,
       shared_params: shared_params,
@@ -212,7 +212,8 @@ defimpl HTTPRequest.Transform, for: RPC do
       method: method,
       path: "/",
       query: shared_params,
-      body: params
+      headers: %{"content-type" => "application/x-www-form-urlencoded"},
+      body: URI.encode_query(params, :www_form)
     })
   end
 end

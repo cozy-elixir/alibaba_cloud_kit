@@ -58,17 +58,4 @@ defmodule CozyAliyunOpenAPI do
   Personally, I recommend using private endpoints as much as possible.
 
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> CozyAliyunOpenAPI.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
 end
