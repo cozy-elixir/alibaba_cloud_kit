@@ -1,5 +1,7 @@
 # CozyAliyunOpenAPI
 
+[![Hex.pm](https://img.shields.io/hexpm/v/cozy_aliyun_open_api.svg)](https://hex.pm/packages/cozy_aliyun_open_api)
+
 > An SDK builder for Aliyun OpenAPI.
 
 This package is an SDK builder. It provides utilities to reduce the cost of creating an SDK, such as:
@@ -19,7 +21,7 @@ Add `:cozy_aliyun_open_api` to the list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:cozy_aliyun_open_api, version}
+    {:cozy_aliyun_open_api, "~> <version>"}
   ]
 end
 ```
