@@ -19,7 +19,7 @@ defmodule CozyAliyunOpenAPI.HTTPClient do
 
   @type status :: pos_integer()
   @type headers :: [{binary(), binary()}]
-  @type body :: map()
+  @type body :: map() | binary()
 
   @typedoc """
   The response of a request.
