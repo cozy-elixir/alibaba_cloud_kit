@@ -36,7 +36,8 @@ defmodule CozyAliyunOpenAPI.MixProject do
       {:jason, "~> 1.0"},
       {:sax_map, "~> 1.0", optional: true},
       {:finch, "~> 0.13", only: [:dev, :test]},
-      {:ex_doc, "~> 0.25", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.25", only: [:dev], runtime: false},
+      {:mox, "~> 1.0", only: [:test]}
     ]
   end
 
