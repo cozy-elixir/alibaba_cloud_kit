@@ -32,7 +32,7 @@ defmodule CozyAliyunOpenAPI.Config do
 
   defp validate_required_keys!(_config) do
     raise ArgumentError,
-          "config :access_key_id, :access_key_secret are required"
+          "key :access_key_id, :access_key_secret should be provided"
   end
 
   defp as_struct!(config) do

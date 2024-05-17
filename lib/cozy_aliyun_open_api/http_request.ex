@@ -81,13 +81,6 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
     |> as_struct!()
   end
 
-  @doc """
-  Creates an HTTP request struct from specs.
-  """
-  def from_spec!(spec) do
-    __MODULE__.Transform.to_request!(spec)
-  end
-
   defp as_struct!(map) do
     default_struct = __MODULE__.__struct__()
     valid_keys = Map.keys(default_struct)
@@ -96,11 +89,64 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
   end
 
   @doc """
-  Parses an URL, then takes the scheme, host, port and path.
+  Gets the url string of an HTTP request struct.
   """
-  def parse_base_url(url) when is_binary(url) do
-    url
-    |> URI.parse()
-    |> Map.take([:scheme, :host, :port, :path])
+  def url(%__MODULE__{} = request) do
+    %URI{
+      scheme: request.scheme,
+      host: request.host,
+      port: request.port,
+      path: request.path,
+      query: URI.encode_query(request.query)
+    }
+    |> URI.to_string()
+  end
+
+  @doc """
+  Creates an HTTP request struct from spec.
+  """
+  def from_spec!(spec) do
+    __MODULE__.Transform.to_request!(spec)
+  end
+
+  def put_query(%__MODULE__{} = request, name, value)
+      when is_binary(name) do
+    new_query = Map.put(request.query, name, value)
+    %{request | query: new_query}
+  end
+
+  def put_query_lazy(%__MODULE__{} = request, name, fun)
+      when is_binary(name) and is_function(fun, 0) do
+    name = String.downcase(name)
+    new_query = Map.put_new_lazy(request.query, name, fun)
+    %{request | query: new_query}
+  end
+
+  def put_query_lazy(%__MODULE__{} = request, name, fun)
+      when is_binary(name) and is_function(fun, 1) do
+    name = String.downcase(name)
+    new_query = Map.put_new_lazy(request.query, name, fn -> apply(fun, [request]) end)
+    %{request | query: new_query}
+  end
+
+  def put_header(%__MODULE__{} = request, name, value)
+      when is_binary(name) and is_binary(value) do
+    name = String.downcase(name)
+    new_headers = Map.put(request.headers, name, value)
+    %{request | headers: new_headers}
+  end
+
+  def put_header_lazy(%__MODULE__{} = request, name, fun)
+      when is_binary(name) and is_function(fun, 0) do
+    name = String.downcase(name)
+    new_headers = Map.put_new_lazy(request.headers, name, fun)
+    %{request | headers: new_headers}
+  end
+
+  def put_header_lazy(%__MODULE__{} = request, name, fun)
+      when is_binary(name) and is_function(fun, 1) do
+    name = String.downcase(name)
+    new_headers = Map.put_new_lazy(request.headers, name, fn -> apply(fun, [request]) end)
+    %{request | headers: new_headers}
   end
 end

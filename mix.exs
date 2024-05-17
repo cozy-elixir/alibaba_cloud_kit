@@ -33,6 +33,7 @@ defmodule CozyAliyunOpenAPI.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:nimble_options, "~> 1.0"},
       {:jason, "~> 1.0"},
       {:sax_map, "~> 1.0", optional: true},
       {:finch, "~> 0.13", only: [:dev, :test]},
