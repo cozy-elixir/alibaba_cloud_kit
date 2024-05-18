@@ -13,7 +13,7 @@ defmodule CozyAliyunOpenAPI.ConfigTest do
 
     test "raises ArgumentError when required keys are missing" do
       assert_raise ArgumentError,
-                   "config :access_key_id, :access_key_secret are required",
+                   "key :access_key_id, :access_key_secret should be provided",
                    fn ->
                      Config.new!(%{})
                    end

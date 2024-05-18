@@ -10,8 +10,8 @@ defmodule CozyAliyunOpenAPITest do
   setup do
     config =
       Config.new!(%{
-        access_key_id: System.fetch_env!("TEST_ACCESS_KEY_ID"),
-        access_key_secret: System.fetch_env!("TEST_ACCESS_KEY_SECRET")
+        access_key_id: System.fetch_env!("OSS_ACCESS_KEY_ID"),
+        access_key_secret: System.fetch_env!("OSS_ACCESS_KEY_SECRET")
       })
 
     [config: config]
