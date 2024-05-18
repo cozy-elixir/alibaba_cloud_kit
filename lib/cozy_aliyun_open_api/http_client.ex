@@ -51,6 +51,14 @@ defmodule CozyAliyunOpenAPI.HTTPClient do
 
   @doc """
   Issues an HTTP request by the given HTTP client.
+
+  When the `content-type` header of the response is `"application/xml"` or
+  `"text/xml"`, this function will try to convert the XML body to a map
+  with snaked-cased keys.
+
+  When the `content-type` header of the response is `"application/json"`,
+  this function will try to convert the body to a map with snaked-cased
+  keys.
   """
   @spec request(HTTPRequest.t()) :: response()
   def request(%HTTPRequest{} = req) do
