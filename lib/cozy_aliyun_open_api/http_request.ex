@@ -97,10 +97,13 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
       host: request.host,
       port: request.port,
       path: request.path,
-      query: URI.encode_query(request.query)
+      query: encode_query(request.query)
     }
     |> URI.to_string()
   end
+
+  defp encode_query(query) when query == %{}, do: nil
+  defp encode_query(query) when is_map(query), do: URI.encode_query(query)
 
   @doc """
   Creates an HTTP request struct from spec.
