@@ -5,8 +5,8 @@ defmodule CozyAliyunOpenAPI.EasyTimeBehaviour do
   @callback utc_now(time_unit()) :: DateTime.t()
   @callback utc_today() :: Date.t()
   @callback to_rfc1123(DateTime.t()) :: String.t()
-  @callback to_basic_iso8601(DateTime.t()) :: String.t()
-  @callback to_basic_iso8601(Date.t()) :: String.t()
+  @callback to_basic_iso8601(DateTime.t() | Date.t()) :: String.t()
+  @callback to_extended_iso8601(DateTime.t() | Date.t()) :: String.t()
 end
 
 defmodule CozyAliyunOpenAPI.EasyTimeImpl do
@@ -29,6 +29,12 @@ defmodule CozyAliyunOpenAPI.EasyTimeImpl do
 
   @impl true
   def to_basic_iso8601(%Date{} = date), do: Date.to_iso8601(date, :basic)
+
+  @impl true
+  def to_extended_iso8601(%DateTime{} = date_time), do: DateTime.to_iso8601(date_time, :extended)
+
+  @impl true
+  def to_extended_iso8601(%Date{} = date), do: Date.to_iso8601(date, :extended)
 end
 
 defmodule CozyAliyunOpenAPI.EasyTime do
@@ -38,6 +44,7 @@ defmodule CozyAliyunOpenAPI.EasyTime do
   def utc_today(), do: impl().utc_today()
   def to_rfc1123(date_time), do: impl().to_rfc1123(date_time)
   def to_basic_iso8601(date_time_or_date), do: impl().to_basic_iso8601(date_time_or_date)
+  def to_extended_iso8601(date_time_or_date), do: impl().to_extended_iso8601(date_time_or_date)
 
   defp impl() do
     Application.get_env(:cozy_aliyun_open_api, :easy_time, CozyAliyunOpenAPI.EasyTimeImpl)

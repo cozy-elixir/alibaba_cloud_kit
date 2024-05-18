@@ -33,6 +33,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
   """
 
   alias CozyAliyunOpenAPI.Config
+  alias CozyAliyunOpenAPI.EasyTime
   alias CozyAliyunOpenAPI.Specs.Utils
 
   @enforce_keys [
@@ -111,7 +112,9 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
     Map.update!(spec, :shared_params, fn shared_params ->
       shared_params
       |> Map.put_new_lazy("Format", fn -> "JSON" end)
-      |> Map.put_new_lazy("Timestamp", fn -> Utils.iso8601_utc_now() end)
+      |> Map.put_new_lazy("Timestamp", fn ->
+        EasyTime.utc_now(:second) |> EasyTime.to_extended_iso8601()
+      end)
       |> Map.put_new_lazy("SignatureNonce", fn -> Utils.random_string() end)
       |> Map.put("AccessKeyId", config.access_key_id)
       |> Map.put("SignatureMethod", "HMAC-SHA1")
