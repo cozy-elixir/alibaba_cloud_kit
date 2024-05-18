@@ -2,10 +2,10 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
   @moduledoc """
   Describes an OSS style API.
 
-  It is built on the RESTful API. Read more at:
+  Read more at:
 
     * [Object Storage Service > Developer Reference > Use the RESTful API to initiate requests](https://www.alibabacloud.com/help/en/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
-    * [Object Storage Service > Developer Reference > Use the RESTful API to initiate requests (zh-Hans)](https://help.aliyun.com/document_detail/375302.html)
+    * [Object Storage Service > Developer Reference > Use the RESTful API to initiate requests (zh-Hans)](https://help.aliyun.com/zh/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
 
   ## About `spec_config`
 

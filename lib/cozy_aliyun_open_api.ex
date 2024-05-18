@@ -2,16 +2,16 @@ defmodule CozyAliyunOpenAPI do
   @moduledoc ~s"""
   An SDK builder for Aliyun / Alibaba Cloud OpenAPI.
 
-  ## Basic Concepts
+  ## Basic concepts
 
-  A complete API call will go through the following steps:
+  An API call will go through the following steps:
 
   1. creating a config.
   2. creating a spec.
   3. transforming the spec to a HTTP request.
   4. sending the HTTP request.
 
-  ## A Code Example
+  ## An example
 
       alias CozyAliyunOpenAPI.Config
       alias CozyAliyunOpenAPI.Specs.RPC
@@ -42,12 +42,14 @@ defmodule CozyAliyunOpenAPI do
       # 4. send the HTTP request
       |> HTTPClient.request()
 
-  > In order to accommodate as many different usage scenarios as possible, `#{inspect(__MODULE__)}`
-  > provides only low-level APIs.
+  > In order to accommodate as many different usage scenarios as possible,
+  > `#{inspect(__MODULE__)}` provides only low-level APIs.
   >
-  > If you find the API calls are tedious, consider to encapsulate the low-level APIs by yourself.
+  > If you find the API calls are tedious, consider to encapsulate the low-level
+  > APIs by yourself. There are some examples in the `/examples` directory for
+  > reference.
 
-  ## API Styles
+  ## API styles
 
   For a variety of reasons, Aliyun OpenAPI involves several different API styles:
 
@@ -61,44 +63,20 @@ defmodule CozyAliyunOpenAPI do
   * `CozyAliyunOpenAPI.Specs.ROA`
   * `CozyAliyunOpenAPI.Specs.OSS`
 
-  ## Authentication & Authorization
-
-  ### required credentials
-
-  Authentication can be accomplished in two ways. Different ways require different credentials:
-
-  * Access Key ID / Access Key Secret
-  * Access Key ID / Access Key Secret / STS Token
-
-  > STS is the shorthand for Security Token Service. It allows developers to manage temporary
-  > credentials to resources.
-
-  ### signature mechanisms
-
-  When using the credentials, the Access Key Secret shouldn't be sent. Intead, signatures generated
-  in a certain way should be used.
-
-  Different API styles use different signature mechanisms. The `CozyAliyunOpenAPI.Specs.*` modules
-  will try their best to include relevant implementations.
-
-  ### authorization
-
-  Before calling any API, please make sure the required permission is granted.
-
-  ## About Endpoints
+  ## About endpoints
 
   In official docs, the term *endpoint* refers to different things:
 
   * sometimes, it refers to a host, such as `ecs-cn-hangzhou.aliyuncs.com`.
   * sometimes, it refers to a URL, such as `https://ecs-cn-hangzhou.aliyuncs.com`.
 
-  That is annoying.
+  This kind of inconsistency is annoying.
 
-  `#{inspect(__MODULE__)}` will always use the endpoint to refer to a valid URL:
+  `#{inspect(__MODULE__)}` will **always** use the term *endpoint* to refer to a base URL:
 
-      <protocol>://<host>/<path>?<query>
+      <protocol>://<host>/<path>
 
-  ### public endpoints
+  ### Public endpoints
 
   * centralized deployments: `<protocol>://<service_code>.aliyuncs.com/`
   * multi-region deployments: `<protocol>://<service_code>.<region_id>.aliyuncs.com/`
@@ -110,7 +88,7 @@ defmodule CozyAliyunOpenAPI do
   * centralized deployments: `<protocol>://<service_code>.vpc-proxy.aliyuncs.com/`
   * multi-region deployments: `<protocol>://<service_code>-vpc.<region_id>.aliyuncs.com/`
 
-  ### public endpoints vs. private endpoints
+  ### Public endpoints vs. Private endpoints
 
   Public endpoints consume public network traffic.
 
@@ -118,6 +96,32 @@ defmodule CozyAliyunOpenAPI do
   speed, and higher level secure protection.
 
   Personally, I recommend using private endpoints as much as possible.
+
+  ## Authentication
+
+  ### Required credentials
+
+  Required credentials can be a combination of the following data:
+
+  * Access Key ID
+  * Access Key Secret
+  * STS Token
+
+  > STS is the shorthand for Security Token Service. It allows developers to manage temporary
+  > credentials to resources.
+
+  Please make sure that you have got the right ones.
+
+  ### Signature mechanisms
+
+  Different API styles use different signature mechanisms.
+
+  The `CozyAliyunOpenAPI.Specs.*` modules will try their best to include relevant
+  implementations. You don't have to implement these yourself.
+
+  ## Authorization
+
+  Before calling any API, please make sure that the required permission is granted.
 
   """
 

@@ -2,7 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/v/cozy_aliyun_open_api.svg)](https://hex.pm/packages/cozy_aliyun_open_api)
 
-> An SDK builder for Aliyun OpenAPI.
+> An SDK builder for Aliyun / Alibaba Cloud OpenAPI.
 
 This package is an SDK builder. It provides utilities to reduce the cost of creating an SDK, such as:
 
@@ -39,7 +39,7 @@ Because:
 - It's hard to do the mapping automatically:
   - The official API documentation isn't structured data.
   - It's hard to parse and map them to API requests.
-- It's hard to do the mapping manually:
+- It's hard to do all the mapping manually:
   - It's a tedius work.
   - It's error-prone.
 

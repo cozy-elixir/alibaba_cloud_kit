@@ -2,8 +2,11 @@ defmodule CozyAliyunOpenAPI.Specs.ROA do
   @moduledoc """
   Describes an ROA style API.
 
-  Read more at
-  [阿里云 SDK > 调用机制 > ROA 调用机制](https://help.aliyun.com/document_detail/315525.html).
+  Read more at:
+
+    * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method](https://www.alibabacloud.com/help/en/sdk/product-overview/request-structure-and-signature/)
+    * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method (zh-Hans)](https://help.aliyun.com/zh/sdk/product-overview/request-structure-and-signature/)
+
   """
 
   alias CozyAliyunOpenAPI.Config
