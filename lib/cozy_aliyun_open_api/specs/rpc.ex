@@ -176,6 +176,8 @@ alias CozyAliyunOpenAPI.Specs.RPC
 alias CozyAliyunOpenAPI.HTTPRequest
 
 defimpl HTTPRequest.Transform, for: RPC do
+  import CozyAliyunOpenAPI.Specs.Utils, only: [parse_base_url: 1]
+
   def to_request!(%RPC{method: :get = method} = rpc) do
     %{
       endpoint: endpoint,
@@ -183,7 +185,7 @@ defimpl HTTPRequest.Transform, for: RPC do
       params: params
     } = rpc
 
-    %{scheme: scheme, host: host, port: port} = HTTPRequest.parse_base_url(endpoint)
+    %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
 
     HTTPRequest.new!(%{
       scheme: scheme,
@@ -203,7 +205,7 @@ defimpl HTTPRequest.Transform, for: RPC do
       params: params
     } = rpc
 
-    %{scheme: scheme, host: host, port: port} = HTTPRequest.parse_base_url(endpoint)
+    %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
 
     HTTPRequest.new!(%{
       scheme: scheme,
