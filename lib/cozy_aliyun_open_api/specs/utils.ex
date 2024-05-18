@@ -14,6 +14,11 @@ defmodule CozyAliyunOpenAPI.Specs.Utils do
   end
 
   @doc false
+  def encode_json!(term) do
+    CozyAliyunOpenAPI.json_library().encode!(term)
+  end
+
+  @doc false
   # https://github.com/elixir-lang/elixir/blob/0a7881ff4b0b71b1fdca2b6332c5ff77188adc3c/lib/elixir/lib/uri.ex#L147
   def encode_rfc3986(term) when not is_list(term) do
     URI.encode(to_string(term), &URI.char_unreserved?/1)
