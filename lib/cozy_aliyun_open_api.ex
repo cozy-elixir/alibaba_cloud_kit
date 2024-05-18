@@ -1,6 +1,6 @@
 defmodule CozyAliyunOpenAPI do
   @moduledoc ~s"""
-  An SDK builder for Aliyun OpenAPI.
+  An SDK builder for Aliyun / Alibaba Cloud OpenAPI.
 
   ## Basic Concepts
 
