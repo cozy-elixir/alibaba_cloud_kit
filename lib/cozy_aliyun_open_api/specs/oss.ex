@@ -44,8 +44,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
       OSS.new!(config, %{
         sign_type: :header,
         region: "oss-us-west-1",
-        method: :get,
         endpoint: "https://oss-us-west-1.aliyuncs.com/",
+        method: :get,
         path: "/"
       })
       |> HTTPRequest.from_spec!()
@@ -67,8 +67,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
         sign_type: :url,
         region: "oss-us-west-1",
         bucket: "example-bucket",
-        method: :get,
         endpoint: "https://example-bucket.oss-us-west-1.aliyuncs.com/",
+        method: :get,
         path: "/example-object",
         headers: %{
           "x-oss-expires" => 900
@@ -94,12 +94,12 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
       type: {:in, [:header, :url]},
       default: :header
     ],
-    method: [
-      type: {:in, [:head, :get, :post, :put, :patch, :delete]},
-      required: true
-    ],
     endpoint: [
       type: :string,
+      required: true
+    ],
+    method: [
+      type: {:in, [:head, :get, :post, :put, :patch, :delete]},
       required: true
     ],
     path: [
@@ -125,8 +125,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
     :region,
     :bucket,
     :sign_type,
-    :method,
     :endpoint,
+    :method,
     :path,
     :query,
     :headers,
@@ -138,7 +138,6 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
   @type region() :: String.t()
   @type bucket() :: String.t() | nil
   @type sign_type() :: :header | :url
-  @type method() :: String.t()
 
   @typedoc """
   The base url that the request is sent to.
@@ -152,6 +151,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
 
   """
   @type endpoint() :: String.t()
+
+  @type method() :: String.t()
   @type path() :: String.t()
   @type query() :: %{
           optional(name :: String.t()) => value :: nil | boolean() | number() | String.t()
@@ -165,8 +166,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
           region: region(),
           bucket: bucket(),
           sign_type: sign_type(),
-          method: method(),
           endpoint: endpoint(),
+          method: method(),
           path: path(),
           query: query(),
           headers: headers(),
@@ -178,8 +179,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
           region: region(),
           bucket: bucket(),
           sign_type: sign_type(),
-          method: method(),
           endpoint: endpoint(),
+          method: method(),
           path: path(),
           query: query(),
           headers: headers(),
@@ -248,8 +249,8 @@ defimpl HTTPRequest.Transform, for: OSS do
       region: region,
       bucket: bucket,
       sign_type: sign_type,
-      method: method,
       endpoint: endpoint,
+      method: method,
       path: path,
       query: query,
       headers: headers,

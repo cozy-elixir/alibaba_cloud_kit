@@ -35,8 +35,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       assert {:ok, 200, _header, _body} =
                OSS.new!(config, %{
                  region: region,
-                 method: :get,
                  endpoint: "https://#{region}.aliyuncs.com/",
+                 method: :get,
                  path: "/"
                })
                |> HTTPRequest.from_spec!()
@@ -50,8 +50,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       assert {:ok, 200, _header, _body} =
                OSS.new!(config, %{
                  region: region,
-                 method: :get,
                  endpoint: "https://#{region}.aliyuncs.com/",
+                 method: :get,
                  path: "/",
                  query: %{"regions" => nil}
                })
@@ -68,8 +68,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                OSS.new!(config, %{
                  region: region,
                  bucket: bucket,
-                 method: :get,
                  endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
+                 method: :get,
                  path: "/",
                  query: %{"list-type" => 2}
                })
@@ -86,8 +86,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                OSS.new!(config, %{
                  region: region,
                  bucket: bucket,
-                 method: :put,
                  endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
+                 method: :put,
                  path: "/oss/put_object.png",
                  body: @example_image_binary
                })
@@ -104,8 +104,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                OSS.new!(config, %{
                  region: region,
                  bucket: bucket,
-                 method: :get,
                  endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
+                 method: :get,
                  path: "/",
                  query: %{"live" => nil}
                })
@@ -138,8 +138,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
           sign_type: :url,
           region: region,
           bucket: bucket,
-          method: :get,
           endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
+          method: :get,
           path: "/oss/get_object.png"
         })
         |> HTTPRequest.from_spec!()
@@ -171,8 +171,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
           sign_type: :header,
           region: "cn-hangzhou",
           bucket: "examplebucket",
-          method: :put,
           endpoint: "https://examplebucket.oss-cn-hangzhou.aliyuncs.com/",
+          method: :put,
           path: "/exampleobject",
           query: %{},
           headers: %{
@@ -223,8 +223,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
           sign_type: :url,
           region: "cn-hangzhou",
           bucket: "examplebucket",
-          method: :put,
           endpoint: "https://examplebucket.oss-cn-hangzhou.aliyuncs.com/",
+          method: :put,
           path: "/exampleobject",
           query: %{
             "x-oss-expires" => 86400
