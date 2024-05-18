@@ -36,7 +36,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
 
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.EasyTime
-  alias CozyAliyunOpenAPI.Specs.Utils
+  alias CozyAliyunOpenAPI.Utils
 
   @enforce_keys [
     :method,
@@ -180,7 +180,7 @@ alias CozyAliyunOpenAPI.Specs.RPC
 alias CozyAliyunOpenAPI.HTTPRequest
 
 defimpl HTTPRequest.Transform, for: RPC do
-  import CozyAliyunOpenAPI.Specs.Utils, only: [parse_base_url: 1]
+  import CozyAliyunOpenAPI.Utils, only: [parse_base_url: 1]
 
   def to_request!(%RPC{method: :get = method} = rpc) do
     %{

@@ -3,7 +3,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSS.Object do
   Provides object related utils.
   """
 
-  import CozyAliyunOpenAPI.Specs.Utils,
+  import CozyAliyunOpenAPI.Utils,
     only: [
       encode_json!: 1,
       hmac_sha256: 2,

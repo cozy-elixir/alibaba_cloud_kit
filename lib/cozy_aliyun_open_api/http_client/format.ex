@@ -1,6 +1,8 @@
 defmodule CozyAliyunOpenAPI.HTTPClient.Format do
   @moduledoc false
 
+  import CozyAliyunOpenAPI.Utils, only: [decode_json!: 1]
+
   @doc """
   Converts XML string to a map.
   """
@@ -39,7 +41,7 @@ defmodule CozyAliyunOpenAPI.HTTPClient.Format do
   @spec convert_json_to_map!(String.t()) :: map()
   def convert_json_to_map!(json_string) do
     json_string
-    |> CozyAliyunOpenAPI.json_library().decode!()
+    |> decode_json!()
     |> to_snake_case()
   end
 

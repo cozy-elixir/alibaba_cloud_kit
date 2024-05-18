@@ -225,7 +225,7 @@ alias CozyAliyunOpenAPI.HTTPRequest
 alias CozyAliyunOpenAPI.EasyTime
 
 defimpl HTTPRequest.Transform, for: OSS do
-  import CozyAliyunOpenAPI.Specs.Utils,
+  import CozyAliyunOpenAPI.Utils,
     only: [
       parse_base_url: 1,
       md5: 1,

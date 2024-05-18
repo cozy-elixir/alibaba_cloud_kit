@@ -1,4 +1,4 @@
-defmodule CozyAliyunOpenAPI.Specs.Utils do
+defmodule CozyAliyunOpenAPI.Utils do
   @moduledoc false
 
   @doc false
@@ -15,7 +15,16 @@ defmodule CozyAliyunOpenAPI.Specs.Utils do
 
   @doc false
   def encode_json!(term) do
-    CozyAliyunOpenAPI.json_library().encode!(term)
+    json_library().encode!(term)
+  end
+
+  @doc false
+  def decode_json!(string) do
+    json_library().decode!(string)
+  end
+
+  defp json_library do
+    Application.fetch_env!(:cozy_aliyun_open_api, :json_library)
   end
 
   @doc false
