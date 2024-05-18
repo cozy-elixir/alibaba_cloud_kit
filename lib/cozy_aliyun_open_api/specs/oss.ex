@@ -363,7 +363,7 @@ defimpl HTTPRequest.Transform, for: OSS do
 
   defp extract_additional_headers(request) do
     request.headers
-    |> Enum.reject(fn kv -> is_ignored_header?(kv) || is_canoncial_header?(kv) end)
+    |> Enum.reject(fn kv -> ignored_header?(kv) || canoncial_header?(kv) end)
     |> sort_headers()
     |> Enum.map_join(";", fn {k, _v} -> k end)
   end
@@ -461,7 +461,7 @@ defimpl HTTPRequest.Transform, for: OSS do
 
   defp build_canonical_headers({request, _sign_args}) do
     request.headers
-    |> Enum.reject(&is_ignored_header?/1)
+    |> Enum.reject(&ignored_header?/1)
     |> sort_headers()
     |> Enum.map_join("", fn {k, v} -> "#{k}:#{v}\n" end)
   end
@@ -478,11 +478,11 @@ defimpl HTTPRequest.Transform, for: OSS do
     Enum.sort_by(headers, &elem(&1, 0), :asc)
   end
 
-  defp is_ignored_header?({k, _v}) do
+  defp ignored_header?({k, _v}) do
     k in ["date"]
   end
 
-  defp is_canoncial_header?({k, _v}) do
+  defp canoncial_header?({k, _v}) do
     k in ["content-type", "content-md5"] ||
       String.starts_with?(k, "x-oss-")
   end

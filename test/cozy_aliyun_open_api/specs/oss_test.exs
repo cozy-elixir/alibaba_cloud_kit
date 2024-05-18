@@ -227,7 +227,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
           method: :put,
           path: "/exampleobject",
           query: %{
-            "x-oss-expires" => 86400
+            "x-oss-expires" => 86_400
           },
           headers: %{
             "x-oss-meta-author" => "alice",
@@ -257,7 +257,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                  "x-oss-additional-headers" => "host",
                  "x-oss-credential" => "accesskeyid/20231203/cn-hangzhou/oss/aliyun_v4_request",
                  "x-oss-date" => "20231203T121212Z",
-                 "x-oss-expires" => 86400,
+                 "x-oss-expires" => 86_400,
                  "x-oss-signature" =>
                    "2c6c9f10d8950fb150290ef6f42570e33cd45d6a57ec7887de75fa2ec45b4c72",
                  "x-oss-signature-version" => "OSS4-HMAC-SHA256"
@@ -283,7 +283,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
           "x-oss-additional-headers" => "host",
           "x-oss-credential" => "accesskeyid/20231203/cn-hangzhou/oss/aliyun_v4_request",
           "x-oss-date" => "20231203T121212Z",
-          "x-oss-expires" => 86400,
+          "x-oss-expires" => 86_400,
           "x-oss-signature" => "a0b8d0aee4e07c66637e6f8e839648970172cc7f9ef3e6be7a6f89083be2db4c",
           "x-oss-signature-version" => "OSS4-HMAC-SHA256"
         },

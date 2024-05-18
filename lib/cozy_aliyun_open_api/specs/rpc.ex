@@ -154,8 +154,8 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
       "/",
       encode_params(params)
     ]
-    |> Enum.map(&rfc3986_encode/1)
-    |> Enum.join("&")
+    |> Enum.map_join("&", &rfc3986_encode/1)
+
   end
 
   defp upcase_method(method) when is_atom(method) do
@@ -167,8 +167,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
   defp encode_params(params) when is_map(params) do
     params
     |> Enum.sort()
-    |> Enum.map(fn {k, v} -> rfc3986_encode(k) <> "=" <> rfc3986_encode(v) end)
-    |> Enum.join("&")
+    |> Enum.map_join("&", fn {k, v} -> rfc3986_encode(k) <> "=" <> rfc3986_encode(v) end)
   end
 
   # https://github.com/elixir-lang/elixir/blob/0a7881ff4b0b71b1fdca2b6332c5ff77188adc3c/lib/elixir/lib/uri.ex#L147

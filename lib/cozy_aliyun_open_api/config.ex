@@ -1,4 +1,8 @@
 defmodule CozyAliyunOpenAPI.Config do
+  @moduledoc """
+  A struct representing a config.
+  """
+
   @enforce_keys [:access_key_id, :access_key_secret]
   defstruct @enforce_keys
 
