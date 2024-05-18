@@ -7,7 +7,6 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
   alias CozyAliyunOpenAPI.Specs.OSS
   alias CozyAliyunOpenAPI.HTTPRequest
   alias CozyAliyunOpenAPI.HTTPClient
-  alias CozyAliyunOpenAPI.URL
 
   setup :verify_on_exit!
 
@@ -115,6 +114,44 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
     end
   end
 
+  describe "Turning an OSS spec as an HTTP url" do
+    setup do
+      config =
+        Config.new!(%{
+          access_key_id: System.fetch_env!("OSS_ACCESS_KEY_ID"),
+          access_key_secret: System.fetch_env!("OSS_ACCESS_KEY_SECRET")
+        })
+
+      region = System.fetch_env!("OSS_REGION")
+      bucket = System.fetch_env!("OSS_BUCKET")
+
+      %{config: config, region: region, bucket: bucket}
+    end
+
+    test "works for Object operations - take GetObject as example", %{
+      config: config,
+      region: region,
+      bucket: bucket
+    } do
+      url =
+        OSS.new!(config, %{
+          sign_type: :url,
+          region: region,
+          bucket: bucket,
+          method: :get,
+          endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
+          path: "/oss/get_object.png"
+        })
+        |> HTTPRequest.from_spec!()
+        |> HTTPRequest.url()
+
+      assert {:ok,
+              %Finch.Response{
+                status: 200
+              }} = Finch.build(:get, url) |> Finch.request(CozyAliyunOpenAPI.Finch)
+    end
+  end
+
   # These tests using the data from official docs are for validating the
   # signing algorithm.
   describe "HTTPRequest.Transform" do
@@ -165,7 +202,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                path: "/exampleobject",
                query: %{},
                headers: %{
-                 "authorization" => "OSS4-HMAC-SHA256 Credential=accesskeyid/20231203/cn-hangzhou/oss/aliyun_v4_request, AdditionalHeaders=host, Signature=4b663e424d2db9967401ff6ce1c86f8c83cabd77d9908475239d9110642c63fa",
+                 "authorization" =>
+                   "OSS4-HMAC-SHA256 Credential=accesskeyid/20231203/cn-hangzhou/oss/aliyun_v4_request, AdditionalHeaders=host, Signature=4b663e424d2db9967401ff6ce1c86f8c83cabd77d9908475239d9110642c63fa",
                  "content-md5" => "eB5eJF1ptWaXm4bijSPyxw",
                  "content-type" => "text/html",
                  "date" => "Sun, 03 Dec 2023 12:12:12 GMT",
@@ -220,7 +258,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                  "x-oss-credential" => "accesskeyid/20231203/cn-hangzhou/oss/aliyun_v4_request",
                  "x-oss-date" => "20231203T121212Z",
                  "x-oss-expires" => 86400,
-                 "x-oss-signature" => "2c6c9f10d8950fb150290ef6f42570e33cd45d6a57ec7887de75fa2ec45b4c72",
+                 "x-oss-signature" =>
+                   "2c6c9f10d8950fb150290ef6f42570e33cd45d6a57ec7887de75fa2ec45b4c72",
                  "x-oss-signature-version" => "OSS4-HMAC-SHA256"
                },
                headers: %{
