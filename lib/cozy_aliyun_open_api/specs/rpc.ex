@@ -155,7 +155,6 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
       encode_params(params)
     ]
     |> Enum.map_join("&", &rfc3986_encode/1)
-
   end
 
   defp upcase_method(method) when is_atom(method) do
