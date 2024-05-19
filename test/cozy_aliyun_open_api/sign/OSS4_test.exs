@@ -1,9 +1,9 @@
-defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4Test do
+defmodule CozyAliyunOpenAPI.Sign.OSS4Test do
   use ExUnit.Case
 
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4
+  alias CozyAliyunOpenAPI.Sign.OSS4
 
   setup do
     config =

@@ -188,7 +188,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
         }
 
   @spec new!(Config.t(), spec_config()) :: t()
-  def new!(%Config{} = config, spec_config) when is_map(spec_config) do
+  def new!(%Config{} = config, %{} = spec_config) do
     spec_config =
       spec_config
       |> Map.to_list()
@@ -212,7 +212,7 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
   alias CozyAliyunOpenAPI.EasyTime
   alias CozyAliyunOpenAPI.Specs.OSS
   alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4
+  alias CozyAliyunOpenAPI.Sign.OSS4
 
   def to_request!(%OSS{} = oss) do
     now = EasyTime.utc_now(:second)

@@ -126,7 +126,7 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
   alias CozyAliyunOpenAPI.EasyTime
   alias CozyAliyunOpenAPI.Specs.RPC
   alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3
+  alias CozyAliyunOpenAPI.Sign.ACS3
 
   def to_request!(%RPC{method: :get} = rpc) do
     now = EasyTime.utc_now(:second)

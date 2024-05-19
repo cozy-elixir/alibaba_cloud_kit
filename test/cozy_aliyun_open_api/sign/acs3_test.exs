@@ -1,9 +1,9 @@
-defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3Test do
+defmodule CozyAliyunOpenAPI.Sign.ACS3Test do
   use ExUnit.Case
 
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3
+  alias CozyAliyunOpenAPI.Sign.ACS3
 
   test "sign/2" do
     config =

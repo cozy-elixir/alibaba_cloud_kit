@@ -1,4 +1,4 @@
-defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4 do
+defmodule CozyAliyunOpenAPI.Sign.OSS4 do
   @moduledoc """
   A implementation for OSS V4 signature.
 
@@ -22,7 +22,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4 do
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.EasyTime
   alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPRequest.Sign
+  alias CozyAliyunOpenAPI.Sign
 
   @signature_version "OSS4-HMAC-SHA256"
   @access_key_version "aliyun_v4"
@@ -32,7 +32,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4 do
   @behaviour Sign
 
   @impl true
-  def sign(request,
+  def sign(%HTTPRequest{} = request,
         at: %DateTime{} = at,
         type: type,
         config: %Config{} = config,

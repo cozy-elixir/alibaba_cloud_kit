@@ -118,6 +118,7 @@ defmodule FileStore do
   defp config do
     :demo
     |> Application.fetch_env!(__MODULE__)
+    |> Keyword.take([:access_key_id, :access_key_secret])
     |> Enum.into(%{})
     |> Config.new!()
   end
