@@ -203,7 +203,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                query: %{},
                headers: %{
                  "authorization" =>
-                   "OSS4-HMAC-SHA256 Credential=accesskeyid/20231203/cn-hangzhou/oss/aliyun_v4_request, AdditionalHeaders=host, Signature=4b663e424d2db9967401ff6ce1c86f8c83cabd77d9908475239d9110642c63fa",
+                   "OSS4-HMAC-SHA256 Credential=accesskeyid/20231203/cn-hangzhou/oss/aliyun_v4_request,AdditionalHeaders=host,Signature=4b663e424d2db9967401ff6ce1c86f8c83cabd77d9908475239d9110642c63fa",
                  "content-md5" => "eB5eJF1ptWaXm4bijSPyxw",
                  "content-type" => "text/html",
                  "date" => "Sun, 03 Dec 2023 12:12:12 GMT",

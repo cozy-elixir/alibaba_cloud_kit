@@ -314,7 +314,7 @@ defimpl HTTPRequest.Transform, for: OSS do
         "Signature=#{sign({request, sign_args})}"
       ]
       |> Enum.reject(&(&1 == nil))
-      |> Enum.join(", ")
+      |> Enum.join(",")
 
     authorization = "#{signature_version} #{content}"
 
