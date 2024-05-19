@@ -115,23 +115,9 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
 
     struct(__MODULE__, spec_config)
     |> put_config(config)
-    |> normalize_headers!()
   end
 
   defp put_config(struct, config), do: Map.put(struct, :config, config)
-
-  defp normalize_headers!(struct) do
-    Map.update!(
-      struct,
-      :headers,
-      &Enum.into(&1, %{}, fn {k, v} ->
-        {
-          k |> Kernel.to_string() |> String.trim() |> String.downcase(),
-          v |> Kernel.to_string() |> String.trim()
-        }
-      end)
-    )
-  end
 end
 
 defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
