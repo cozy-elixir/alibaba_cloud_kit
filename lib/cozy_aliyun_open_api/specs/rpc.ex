@@ -2,11 +2,6 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
   @moduledoc """
   Describes an RPC style API.
 
-  Read more at:
-
-    * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method](https://www.alibabacloud.com/help/en/sdk/product-overview/request-structure-and-signature/)
-    * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method (zh-Hans)](https://help.aliyun.com/zh/sdk/product-overview/request-structure-and-signature/)
-
   ## Examples
 
       alias CozyAliyunOpenAPI.Config
@@ -19,176 +14,140 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
         })
 
       RPC.new!(config, %{
+        endpoint: "https://ecs-cn-hangzhou.aliyuncs.com/",
         method: :post,
-        endpoint: "https://example.com/",
-        shared_params: %{
-          "Action" => "SingleSendMail",
-          "Version" => "2015-11-23",
-          # ...
-        },
+        version: "2015-11-23",
+        action: "DescribeInstanceStatus",
         params: %{
-          "AccountName" => "...",
-          # ...
+          "RegionId" => "cn-hangzhou"
         }
       })
 
   """
 
   alias CozyAliyunOpenAPI.Config
-  alias CozyAliyunOpenAPI.EasyTime
-  alias CozyAliyunOpenAPI.Utils
+
+  @spec_config_schema [
+    endpoint: [
+      type: :string,
+      required: true
+    ],
+    method: [
+      type: {:in, [:get, :post]},
+      default: :post
+    ],
+    headers: [
+      type: {:map, :string, {:or, [nil, :boolean, :integer, :float, :string]}},
+      default: %{}
+    ],
+    version: [
+      type: :string,
+      required: true
+    ],
+    action: [
+      type: :string,
+      required: true
+    ],
+    params: [
+      type: {:or, [{:map, :any, :any}, nil]},
+      default: nil
+    ]
+  ]
 
   @enforce_keys [
-    :method,
+    :config,
     :endpoint,
-    :shared_params,
+    :method,
+    :headers,
+    :version,
+    :action,
     :params
   ]
-  defstruct method: nil,
-            endpoint: nil,
-            shared_params: %{},
-            params: %{}
 
-  @type method() :: :get | :post
+  defstruct @enforce_keys
+
   @type endpoint() :: String.t()
-  @type shared_params() :: %{
-          optional(name :: String.t()) => value :: boolean() | number() | String.t()
+  @type method() :: :get | :post
+  @type headers() :: %{
+          optional(name :: String.t()) => value :: nil | boolean() | number() | String.t()
         }
+
+  @type version() :: String.t()
+  @type action() :: String.t()
   @type params() ::
           %{
-            optional(name :: String.t()) => value :: boolean() | number() | String.t()
+            optional(name :: String.t()) => value :: nil | boolean() | number() | String.t()
           }
           | nil
 
   @type spec_config() :: %{
-          method: method(),
           endpoint: endpoint(),
-          shared_params: shared_params(),
+          method: method(),
+          headers: headers(),
+          version: version(),
+          action: action(),
           params: params()
         }
 
   @type t :: %__MODULE__{
-          method: method(),
+          config: Config.t(),
           endpoint: endpoint(),
-          shared_params: shared_params(),
+          method: method(),
+          headers: headers(),
+          version: version(),
+          action: action(),
           params: params()
         }
 
   @spec new!(Config.t(), spec_config()) :: t()
   def new!(%Config{} = config, %{} = spec_config) do
-    spec_config
-    |> validate_method!()
-    |> validate_endpoint!()
-    |> as_struct!()
-    |> put_shared_params!(config)
-    |> put_signature(config)
+    spec_config =
+      spec_config
+      |> Map.to_list()
+      |> NimbleOptions.validate!(@spec_config_schema)
+
+    struct(__MODULE__, spec_config)
+    |> put_config(config)
+    |> normalize_headers!()
   end
 
-  @valid_methods [:get, :post]
-  defp validate_method!(%{method: method} = spec_config) when method in @valid_methods do
-    spec_config
-  end
+  defp put_config(struct, config), do: Map.put(struct, :config, config)
 
-  defp validate_method!(_spec_config) do
-    raise ArgumentError, "key :method should be one of #{inspect(@valid_methods)}"
-  end
-
-  defp validate_endpoint!(%{endpoint: endpoint} = spec_config) when is_binary(endpoint) do
-    spec_config
-  end
-
-  defp validate_endpoint!(_spec_config) do
-    raise ArgumentError, "key :endpoint should be provided"
-  end
-
-  defp as_struct!(spec_config) do
-    default_struct = __MODULE__.__struct__()
-    valid_keys = Map.keys(default_struct)
-    spec_config = Map.take(spec_config, valid_keys)
-    Map.merge(default_struct, spec_config)
-  end
-
-  # Action
-  # Version
-  defp put_shared_params!(%__MODULE__{} = spec, %Config{} = config) do
-    Map.update!(spec, :shared_params, fn shared_params ->
-      shared_params
-      |> Map.put_new_lazy("Format", fn -> "JSON" end)
-      |> Map.put_new_lazy("Timestamp", fn ->
-        EasyTime.utc_now(:second) |> EasyTime.to_extended_iso8601()
+  defp normalize_headers!(struct) do
+    Map.update!(
+      struct,
+      :headers,
+      &Enum.into(&1, %{}, fn {k, v} ->
+        {
+          k |> Kernel.to_string() |> String.trim() |> String.downcase(),
+          v |> Kernel.to_string() |> String.trim()
+        }
       end)
-      |> Map.put_new_lazy("SignatureNonce", fn -> Utils.random_string() end)
-      |> Map.put("AccessKeyId", config.access_key_id)
-      |> Map.put("SignatureMethod", "HMAC-SHA1")
-      |> Map.put("SignatureVersion", "1.0")
-    end)
-  end
-
-  defp put_signature(%__MODULE__{} = spec, %Config{} = config) do
-    %{
-      method: method,
-      shared_params: shared_params,
-      params: params
-    } = spec
-
-    all_params = Map.merge(shared_params, params)
-
-    signature =
-      string_to_sign({method, all_params})
-      |> sign(config.access_key_secret)
-
-    Map.update!(spec, :shared_params, fn shared_params ->
-      Map.put(shared_params, "Signature", signature)
-    end)
-  end
-
-  defp sign(string_to_sign, secret) do
-    string_to_sign
-    |> then(&:crypto.mac(:hmac, :sha, "#{secret}&", &1))
-    |> Base.encode64()
-  end
-
-  defp string_to_sign({method, params}) do
-    [
-      upcase_method(method),
-      "/",
-      encode_params(params)
-    ]
-    |> Enum.map_join("&", &rfc3986_encode/1)
-  end
-
-  defp upcase_method(method) when is_atom(method) do
-    method
-    |> to_string()
-    |> String.upcase()
-  end
-
-  defp encode_params(params) when is_map(params) do
-    params
-    |> Enum.sort()
-    |> Enum.map_join("&", fn {k, v} -> rfc3986_encode(k) <> "=" <> rfc3986_encode(v) end)
-  end
-
-  # https://github.com/elixir-lang/elixir/blob/0a7881ff4b0b71b1fdca2b6332c5ff77188adc3c/lib/elixir/lib/uri.ex#L147
-  defp rfc3986_encode(string) do
-    URI.encode(to_string(string), &URI.char_unreserved?/1)
+    )
   end
 end
 
-alias CozyAliyunOpenAPI.Specs.RPC
-alias CozyAliyunOpenAPI.HTTPRequest
-
-defimpl HTTPRequest.Transform, for: RPC do
+defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
+  for: CozyAliyunOpenAPI.Specs.RPC do
   import CozyAliyunOpenAPI.Utils, only: [parse_base_url: 1]
+  alias CozyAliyunOpenAPI.EasyTime
+  alias CozyAliyunOpenAPI.Specs.RPC
+  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3
 
-  def to_request!(%RPC{method: :get = method} = rpc) do
+  def to_request!(%RPC{method: :get} = rpc) do
     %{
+      config: config,
       endpoint: endpoint,
-      shared_params: shared_params,
+      method: method,
+      version: version,
+      action: action,
+      headers: headers,
       params: params
     } = rpc
 
     %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
+    now = EasyTime.utc_now(:second)
 
     HTTPRequest.new!(%{
       scheme: scheme,
@@ -196,19 +155,27 @@ defimpl HTTPRequest.Transform, for: RPC do
       port: port,
       method: method,
       path: "/",
-      query: Map.merge(shared_params, params),
-      body: nil
+      query: params,
+      headers: headers
     })
+    |> HTTPRequest.put_header("x-acs-version", version)
+    |> HTTPRequest.put_header("x-acs-action", action)
+    |> ACS3.sign(config: config, at: now)
   end
 
-  def to_request!(%RPC{method: :post = method} = rpc) do
+  def to_request!(%RPC{method: :post} = rpc) do
     %{
+      config: config,
       endpoint: endpoint,
-      shared_params: shared_params,
+      method: method,
+      version: version,
+      action: action,
+      headers: headers,
       params: params
     } = rpc
 
     %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
+    now = EasyTime.utc_now(:second)
 
     HTTPRequest.new!(%{
       scheme: scheme,
@@ -216,9 +183,17 @@ defimpl HTTPRequest.Transform, for: RPC do
       port: port,
       method: method,
       path: "/",
-      query: shared_params,
-      headers: %{"content-type" => "application/x-www-form-urlencoded"},
-      body: URI.encode_query(params, :www_form)
+      headers: headers
     })
+    |> HTTPRequest.put_header("x-acs-version", version)
+    |> HTTPRequest.put_header("x-acs-action", action)
+    |> put_post_params(params)
+    |> ACS3.sign(config: config, at: now)
+  end
+
+  defp put_post_params(%{method: :post} = request, params) do
+    request
+    |> HTTPRequest.put_header("content-type", "application/x-www-form-urlencoded")
+    |> HTTPRequest.put_body(URI.encode_query(params, :www_form))
   end
 end

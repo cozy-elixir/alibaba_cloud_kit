@@ -162,4 +162,8 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
     new_headers = Map.put_new_lazy(request.headers, name, fn -> apply(fun, [request]) end)
     %{request | headers: new_headers}
   end
+
+  def put_body(%__MODULE__{} = request, value) do
+    %{request | body: value}
+  end
 end
