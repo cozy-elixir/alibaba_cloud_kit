@@ -55,8 +55,8 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4Test do
              body: nil
            } =
              OSS4.sign(request,
-               type: :header,
                at: ~U[2023-12-03 12:12:12Z],
+               type: :header,
                config: config,
                region: "oss-cn-hangzhou",
                bucket: "examplebucket"
@@ -105,8 +105,8 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4Test do
              body: nil
            } =
              OSS4.sign(request,
-               type: :url,
                at: ~U[2023-12-03 12:12:12Z],
+               type: :url,
                config: config,
                region: "oss-cn-hangzhou",
                bucket: "examplebucket"

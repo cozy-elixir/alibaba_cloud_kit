@@ -33,8 +33,8 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4 do
 
   @impl true
   def sign(request,
-        type: type,
         at: %DateTime{} = at,
+        type: type,
         config: %Config{} = config,
         region: region,
         bucket: bucket
