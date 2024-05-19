@@ -3,7 +3,7 @@ defmodule CozyAliyunOpenAPI.Utils do
 
   @doc false
   def random_string() do
-    :crypto.strong_rand_bytes(24) |> Base.encode64(padding: false)
+    :crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)
   end
 
   @doc false

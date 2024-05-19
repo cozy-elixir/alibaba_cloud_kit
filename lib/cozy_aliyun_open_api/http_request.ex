@@ -118,6 +118,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
     %{request | query: new_query}
   end
 
+  # TODO: remove it
   def put_query_lazy(%__MODULE__{} = request, name, fun)
       when is_binary(name) and is_function(fun, 0) do
     name = String.downcase(name)
@@ -139,6 +140,15 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
     %{request | headers: new_headers}
   end
 
+  def put_header(%__MODULE__{} = request, name, fun)
+      when is_binary(name) and is_function(fun, 1) do
+    name = String.downcase(name)
+    value = apply(fun, [request])
+    new_headers = Map.put(request.headers, name, value)
+    %{request | headers: new_headers}
+  end
+
+  # TODO: remove it
   def put_header_lazy(%__MODULE__{} = request, name, fun)
       when is_binary(name) and is_function(fun, 0) do
     name = String.downcase(name)
