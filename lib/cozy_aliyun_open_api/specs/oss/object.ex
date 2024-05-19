@@ -69,7 +69,13 @@ defmodule CozyAliyunOpenAPI.Specs.OSS.Object do
       signature_version: signature_version,
       credential: credential,
       datetime: datetime
-    } = OSS4.prepare_sign_info_for_post_policy(at: now, config: config, region: region, bucket: bucket)
+    } =
+      OSS4.prepare_sign_info_for_post_policy(
+        at: now,
+        config: config,
+        region: region,
+        bucket: bucket
+      )
 
     post_policy = %PostPolicy{
       expiration: build_expiration(now, seconds_to_expire),
