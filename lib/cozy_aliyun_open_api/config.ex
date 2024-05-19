@@ -3,6 +3,17 @@ defmodule CozyAliyunOpenAPI.Config do
   A struct representing a config.
   """
 
+  @config_schema [
+    access_key_id: [
+      type: :string,
+      required: true
+    ],
+    access_key_secret: [
+      type: :string,
+      required: true
+    ]
+  ]
+
   @enforce_keys [:access_key_id, :access_key_secret]
   defstruct @enforce_keys
 
@@ -17,32 +28,10 @@ defmodule CozyAliyunOpenAPI.Config do
         }
 
   @spec new!(config()) :: t()
-  def new!(config) when is_map(config) do
+  def new!(%{} = config) do
     config
-    |> validate_required_keys!()
-    |> as_struct!()
-  end
-
-  defp validate_required_keys!(
-         %{
-           access_key_id: access_key_id,
-           access_key_secret: access_key_secret
-         } = config
-       )
-       when is_binary(access_key_id) and
-              is_binary(access_key_secret) do
-    config
-  end
-
-  defp validate_required_keys!(_config) do
-    raise ArgumentError,
-          "key :access_key_id, :access_key_secret should be provided"
-  end
-
-  defp as_struct!(config) do
-    default_struct = __MODULE__.__struct__()
-    valid_keys = Map.keys(default_struct)
-    config = Map.take(config, valid_keys)
-    Map.merge(default_struct, config)
+    |> Map.to_list()
+    |> NimbleOptions.validate!(@config_schema)
+    |> then(&struct(__MODULE__, &1))
   end
 end

@@ -11,11 +11,17 @@ defmodule CozyAliyunOpenAPI.ConfigTest do
                })
     end
 
-    test "raises ArgumentError when required keys are missing" do
-      assert_raise ArgumentError,
-                   "key :access_key_id, :access_key_secret should be provided",
+    test "raises error when required keys are missing" do
+      assert_raise NimbleOptions.ValidationError,
+                   "required :access_key_id option not found, received options: []",
                    fn ->
                      Config.new!(%{})
+                   end
+
+      assert_raise NimbleOptions.ValidationError,
+                   "required :access_key_secret option not found, received options: [:access_key_id]",
+                   fn ->
+                     Config.new!(%{access_key_id: "..."})
                    end
     end
   end
