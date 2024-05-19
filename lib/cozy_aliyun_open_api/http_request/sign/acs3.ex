@@ -12,7 +12,6 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3 do
   import CozyAliyunOpenAPI.Utils,
     only: [
       random_string: 0,
-      encode_rfc3986: 1,
       sha256: 1,
       hmac_sha256: 2,
       base16: 1
@@ -28,10 +27,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3 do
   @behaviour Sign
 
   @impl true
-  def sign(request, %{
-        config: %Config{} = config,
-        at: %DateTime{} = at
-      }) do
+  def sign(request, config: %Config{} = config, at: %DateTime{} = at) do
     datetime = EasyTime.to_extended_iso8601(at)
 
     request
@@ -112,7 +108,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3 do
     request.headers
     |> Enum.reject(&ignored_header?/1)
     |> sort_headers()
-    |> Enum.map_join(";", fn {k, v} -> k end)
+    |> Enum.map_join(";", fn {k, _v} -> k end)
   end
 
   defp build_hashed_payload(request) do
