@@ -143,6 +143,8 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
   alias CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3
 
   def to_request!(%RPC{method: :get} = rpc) do
+    now = EasyTime.utc_now(:second)
+
     %{
       config: config,
       endpoint: endpoint,
@@ -154,7 +156,6 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
     } = rpc
 
     %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
-    now = EasyTime.utc_now(:second)
 
     HTTPRequest.new!(%{
       scheme: scheme,
@@ -167,10 +168,12 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
     })
     |> HTTPRequest.put_header("x-acs-version", version)
     |> HTTPRequest.put_header("x-acs-action", action)
-    |> ACS3.sign(config: config, at: now)
+    |> ACS3.sign(at: now, config: config)
   end
 
   def to_request!(%RPC{method: :post} = rpc) do
+    now = EasyTime.utc_now(:second)
+
     %{
       config: config,
       endpoint: endpoint,
@@ -182,7 +185,6 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
     } = rpc
 
     %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
-    now = EasyTime.utc_now(:second)
 
     HTTPRequest.new!(%{
       scheme: scheme,
@@ -195,7 +197,7 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
     |> HTTPRequest.put_header("x-acs-version", version)
     |> HTTPRequest.put_header("x-acs-action", action)
     |> put_post_params(params)
-    |> ACS3.sign(config: config, at: now)
+    |> ACS3.sign(at: now, config: config)
   end
 
   defp put_post_params(%{method: :post} = request, params) do

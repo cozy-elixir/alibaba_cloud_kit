@@ -52,6 +52,6 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3Test do
                "x-acs-version" => "2014-05-26"
              },
              body: nil
-           } = ACS3.sign(request, %{config: config, at: ~U[2023-10-26 10:22:32Z]})
+           } = ACS3.sign(request, at: ~U[2023-10-26 10:22:32Z], config: config)
   end
 end

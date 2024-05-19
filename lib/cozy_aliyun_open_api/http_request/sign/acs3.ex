@@ -27,7 +27,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3 do
   @behaviour Sign
 
   @impl true
-  def sign(request, config: %Config{} = config, at: %DateTime{} = at) do
+  def sign(request, at: %DateTime{} = at, config: %Config{} = config) do
     datetime = EasyTime.to_extended_iso8601(at)
 
     request
