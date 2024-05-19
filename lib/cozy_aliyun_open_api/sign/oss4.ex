@@ -85,6 +85,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     }
   end
 
+  @doc false
   def prepare_sign_info_for_post_policy(
         at: %DateTime{} = at,
         config: %Config{} = config,
