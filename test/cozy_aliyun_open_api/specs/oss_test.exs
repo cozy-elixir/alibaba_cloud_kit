@@ -1,14 +1,10 @@
 defmodule CozyAliyunOpenAPI.Specs.OSSTest do
-  use ExUnit.Case, async: false
-
-  import Mox
+  use ExUnit.Case
 
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.Specs.OSS
   alias CozyAliyunOpenAPI.HTTPRequest
   alias CozyAliyunOpenAPI.HTTPClient
-
-  setup :verify_on_exit!
 
   @example_image_binary "../../files/lenna.png"
                         |> Path.expand(__DIR__)
