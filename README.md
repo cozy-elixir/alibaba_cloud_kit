@@ -48,6 +48,10 @@ And, in most real apps, it's rare that all available APIs are required. In gener
 
 The simpler, the better.
 
+### Why not using a simple and short name?
+
+I want to describe what a package does clearly and explicitly. The length of a name doesn't matter, as long as it is clear and explicit.
+
 ## License
 
 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
