@@ -197,7 +197,6 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
     struct(__MODULE__, spec_config)
     |> put_config(config)
     |> normalize_path!()
-    |> normalize_headers!()
   end
 
   defp put_config(struct, config), do: Map.put(struct, :config, config)
@@ -205,50 +204,24 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
   defp normalize_path!(struct) do
     Map.update!(struct, :path, &Path.join("/", &1))
   end
-
-  defp normalize_headers!(struct) do
-    Map.update!(
-      struct,
-      :headers,
-      &Enum.into(&1, %{}, fn {k, v} ->
-        {
-          k |> Kernel.to_string() |> String.trim() |> String.downcase(),
-          v |> Kernel.to_string() |> String.trim()
-        }
-      end)
-    )
-  end
 end
 
-alias CozyAliyunOpenAPI.Specs.OSS
-alias CozyAliyunOpenAPI.HTTPRequest
-alias CozyAliyunOpenAPI.EasyTime
-
-defimpl HTTPRequest.Transform, for: OSS do
-  import CozyAliyunOpenAPI.Utils,
-    only: [
-      parse_base_url: 1,
-      md5: 1,
-      sha256: 1,
-      hmac_sha256: 2,
-      base16: 1,
-      base64: 1,
-      encode_rfc3986: 1
-    ]
+defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
+  for: CozyAliyunOpenAPI.Specs.OSS do
+  import CozyAliyunOpenAPI.Utils, only: [parse_base_url: 1]
+  alias CozyAliyunOpenAPI.EasyTime
+  alias CozyAliyunOpenAPI.Specs.OSS
+  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4
 
   def to_request!(%OSS{} = oss) do
-    utc_datetime = EasyTime.utc_now(:second)
-    utc_date = EasyTime.utc_today()
-
-    utc_datetime_in_iso8601 = EasyTime.to_basic_iso8601(utc_datetime)
-    utc_datetime_in_rfc1123 = EasyTime.to_rfc1123(utc_datetime)
-    utc_date_in_iso8601 = EasyTime.to_basic_iso8601(utc_date)
+    now = EasyTime.utc_now(:second)
 
     %{
       config: config,
       region: region,
       bucket: bucket,
-      sign_type: sign_type,
+      sign_type: type,
       endpoint: endpoint,
       method: method,
       path: path,
@@ -259,231 +232,18 @@ defimpl HTTPRequest.Transform, for: OSS do
 
     %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
 
-    request =
-      HTTPRequest.new!(%{
-        scheme: scheme,
-        host: host,
-        port: port,
-        method: method,
-        path: path,
-        query: query,
-        headers: headers,
-        body: body
-      })
-      |> HTTPRequest.put_header("host", host)
-      |> HTTPRequest.put_new_header("date", fn _request -> utc_datetime_in_rfc1123 end)
-
-    sign_args = %{
-      sign_type: sign_type,
-      signature_version: "OSS4-HMAC-SHA256",
-      access_key_version: "aliyun_v4",
-      request_version: "aliyun_v4_request",
-      service: "oss",
-      datetime: utc_datetime_in_iso8601,
-      date: utc_date_in_iso8601,
-      config: config,
-      region: String.trim_leading(region, "oss-"),
-      bucket: bucket
-    }
-
-    put_sign({request, sign_args})
-  end
-
-  defp put_sign({request, %{sign_type: :header} = sign_args}) do
-    %{
-      signature_version: signature_version,
-      datetime: datetime
-    } = sign_args
-
-    request =
-      request
-      |> HTTPRequest.put_new_header("content-md5", &build_content_md5(&1))
-      |> HTTPRequest.put_new_header("content-type", &detect_content_type(&1))
-      # x-oss-date is required, even if the documentation doesn't mention it ;)
-      |> HTTPRequest.put_header("x-oss-date", datetime)
-      |> HTTPRequest.put_header("x-oss-content-sha256", "UNSIGNED-PAYLOAD")
-
-    # Set and use additional_headers after request is updated.
-    sign_args = Map.put(sign_args, :additional_headers, extract_additional_headers(request))
-    %{additional_headers: additional_headers} = sign_args
-
-    content =
-      [
-        "Credential=#{build_credential({request, sign_args})}",
-        if(additional_headers != [], do: "AdditionalHeaders=#{additional_headers}", else: nil),
-        "Signature=#{sign({request, sign_args})}"
-      ]
-      |> Enum.reject(&(&1 == nil))
-      |> Enum.join(",")
-
-    authorization = "#{signature_version} #{content}"
-
-    request
-    |> HTTPRequest.put_header("authorization", authorization)
-  end
-
-  defp put_sign({request, %{sign_type: :url} = sign_args}) do
-    %{
-      signature_version: signature_version,
-      datetime: datetime
-    } = sign_args
-
-    request =
-      request
-      |> HTTPRequest.put_query("x-oss-signature-version", signature_version)
-      |> HTTPRequest.put_query("x-oss-credential", build_credential({request, sign_args}))
-      |> HTTPRequest.put_query("x-oss-date", datetime)
-      |> HTTPRequest.put_new_query("x-oss-expires", fn _request -> 3600 end)
-
-    # Set and use additional_headers after request is updated.
-    sign_args = Map.put(sign_args, :additional_headers, extract_additional_headers(request))
-    %{additional_headers: additional_headers} = sign_args
-
-    request =
-      HTTPRequest.put_query(request, "x-oss-additional-headers", additional_headers)
-
-    request
-    |> HTTPRequest.put_query("x-oss-signature", sign({request, sign_args}))
-  end
-
-  defp build_content_md5(request) do
-    %{body: body} = request
-
-    (body || "")
-    |> md5()
-    |> base64()
-  end
-
-  defp detect_content_type(request) do
-    case Path.extname(request.path) do
-      "." <> name -> MIME.type(name)
-      _ -> "application/octet-stream"
-    end
-  end
-
-  defp extract_additional_headers(request) do
-    request.headers
-    |> Enum.reject(fn kv -> ignored_header?(kv) || canoncial_header?(kv) end)
-    |> sort_headers()
-    |> Enum.map_join(";", fn {k, _v} -> k end)
-  end
-
-  defp build_credential({_request, sign_args}) do
-    %{
-      config: %{access_key_id: access_key_id},
-      request_version: request_version,
-      service: service,
-      region: region,
-      date: date
-    } = sign_args
-
-    Enum.join([access_key_id, date, region, service, request_version], "/")
-  end
-
-  defp sign({request, sign_args}) do
-    %{
-      config: %{access_key_secret: access_key_secret},
-      access_key_version: access_key_version,
-      request_version: request_version,
-      service: service,
-      region: region,
-      date: date
-    } = sign_args
-
-    "#{access_key_version}#{access_key_secret}"
-    |> hmac_sha256(date)
-    |> hmac_sha256(region)
-    |> hmac_sha256(service)
-    |> hmac_sha256(request_version)
-    |> hmac_sha256(build_string_to_sign({request, sign_args}))
-    |> base16()
-  end
-
-  defp build_string_to_sign({request, sign_args}) do
-    %{
-      request_version: request_version,
-      service: service,
-      region: region,
-      datetime: datetime,
-      date: date
-    } = sign_args
-
-    scope = Enum.join([date, region, service, request_version], "/")
-    canonical_request = build_canonical_request({request, sign_args})
-
-    [
-      "OSS4-HMAC-SHA256",
-      datetime,
-      scope,
-      canonical_request |> sha256() |> base16()
-    ]
-    |> Enum.join("\n")
-  end
-
-  defp build_canonical_request({request, sign_args}) do
-    [
-      build_method({request, sign_args}),
-      build_canonical_path({request, sign_args}),
-      build_canonical_querystring({request, sign_args}),
-      build_canonical_headers({request, sign_args}),
-      build_additional_headers({request, sign_args}),
-      build_hashed_payload({request, sign_args})
-    ]
-    |> Enum.join("\n")
-  end
-
-  defp build_method({request, _sign_args}) do
-    request.method
-    |> Atom.to_string()
-    |> String.upcase()
-  end
-
-  defp build_canonical_path({request, sign_args}) do
-    %{bucket: bucket} = sign_args
-    path = request.path
-
-    if(bucket,
-      do: "/#{bucket}#{path}",
-      else: path
-    )
-    |> URI.encode()
-  end
-
-  defp build_canonical_querystring({request, _sign_args}) do
-    request.query
-    |> Enum.sort()
-    |> Enum.map_join("&", fn
-      {k, nil} -> encode_rfc3986(k)
-      {k, ""} -> encode_rfc3986(k)
-      {k, v} -> encode_rfc3986(k) <> "=" <> encode_rfc3986(v)
-    end)
-  end
-
-  defp build_canonical_headers({request, _sign_args}) do
-    request.headers
-    |> Enum.reject(&ignored_header?/1)
-    |> sort_headers()
-    |> Enum.map_join("", fn {k, v} -> "#{k}:#{v}\n" end)
-  end
-
-  defp build_additional_headers({_request, sign_args}) do
-    sign_args.additional_headers
-  end
-
-  defp build_hashed_payload({_request, _sign_args}) do
-    "UNSIGNED-PAYLOAD"
-  end
-
-  defp sort_headers(headers) do
-    Enum.sort_by(headers, &elem(&1, 0), :asc)
-  end
-
-  defp ignored_header?({k, _v}) do
-    k in ["date"]
-  end
-
-  defp canoncial_header?({k, _v}) do
-    k in ["content-type", "content-md5"] ||
-      String.starts_with?(k, "x-oss-")
+    HTTPRequest.new!(%{
+      scheme: scheme,
+      host: host,
+      port: port,
+      method: method,
+      path: path,
+      query: query,
+      headers: headers,
+      body: body
+    })
+    |> HTTPRequest.put_header("host", host)
+    |> HTTPRequest.put_new_header("date", fn _request -> EasyTime.to_rfc1123(now) end)
+    |> OSS4.sign(at: now, type: type, config: config, region: region, bucket: bucket)
   end
 end
