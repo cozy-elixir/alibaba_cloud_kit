@@ -12,7 +12,7 @@ This package is an SDK builder. It provides utilities to reduce the cost of crea
 - converting the XML content or JSON content in the response to a map with snake-cased keys
 - ...
 
-It doesn't provide one-to-one mapping against all available APIs provided by Aliyun OpenAPI. See the reason in [FAQ](#faq).
+It doesn't provide one-to-one mapping against all available APIs. See the reason in [FAQ](#faq).
 
 ## Installation
 
@@ -42,8 +42,9 @@ Because:
 - It's hard to do all the mapping manually:
   - It's a tedius work.
   - It's error-prone.
+- For an individual like me, this is a significant amount of work. I don't want to spend my time on such things.
 
-And, in real apps, it's rare that all available APIs are required. In general, only a few API are required. So, mapping what is required is acceptable.
+And, in most real apps, it's rare that all available APIs are required. In general, only a few API are required. So, mapping what is required is acceptable.
 
 The simpler, the better.
 
