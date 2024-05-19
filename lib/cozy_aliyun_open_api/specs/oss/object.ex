@@ -3,16 +3,10 @@ defmodule CozyAliyunOpenAPI.Specs.OSS.Object do
   Provides object related utils.
   """
 
-  import CozyAliyunOpenAPI.Utils,
-    only: [
-      encode_json!: 1,
-      hmac_sha256: 2,
-      base16: 1,
-      base64: 1
-    ]
-
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.EasyTime
+  alias CozyAliyunOpenAPI.Sign.OSS4
+  alias CozyAliyunOpenAPI.Specs.OSS.Object.PostPolicy
 
   @doc """
   Presigns a `PostObject` operation and returns the necessary form data when
@@ -31,6 +25,12 @@ defmodule CozyAliyunOpenAPI.Specs.OSS.Object do
 
   ## Examples
 
+      config =
+        Config.new!(%{
+          access_key_id: "...",
+          access_key_secret: "..."
+        })
+
       region = "oss-us-west-1"
       bucket = "example-bucket"
       conditions = [
@@ -40,7 +40,17 @@ defmodule CozyAliyunOpenAPI.Specs.OSS.Object do
       ]
       seconds_to_expire = 3600
 
-      sign_post_object_policy(config, region, bucket, conditions, seconds_to_expire)
+      presign_post_object(config, region, bucket, conditions, seconds_to_expire)
+
+      # returns:
+      #
+      # %{
+      #   policy: "eyJjb25ka ... jM1OjUxWiJ9",
+      #   "x-oss-signature-version": "OSS4-HMAC-SHA256",
+      #   "x-oss-credential": ".../20240519/us-west-1/oss/aliyun_v4_request",
+      #   "x-oss-date": "20240519T143551Z",
+      #   "x-oss-signature": "4526fe7c1e9f58f3da7edbfb31758721564f38bfba5cdd3f5d8d5ae67a60c60b"
+      # }
 
   """
 
@@ -53,80 +63,35 @@ defmodule CozyAliyunOpenAPI.Specs.OSS.Object do
         }
   def presign_post_object(%Config{} = config, region, bucket, conditions, seconds_to_expire)
       when is_list(conditions) and is_integer(seconds_to_expire) do
-    signature_version = "OSS4-HMAC-SHA256"
-    utc_datetime = EasyTime.utc_now(:second)
-    utc_datetime_in_iso8601 = EasyTime.to_basic_iso8601(utc_datetime)
-    utc_date_in_iso8601 = EasyTime.utc_today() |> EasyTime.to_basic_iso8601()
+    now = EasyTime.utc_now(:second)
 
-    sign_args = %{
+    %{
       signature_version: signature_version,
-      access_key_version: "aliyun_v4",
-      request_version: "aliyun_v4_request",
-      service: "oss",
-      datetime: utc_datetime_in_iso8601,
-      date: utc_date_in_iso8601,
-      config: config,
-      region: String.trim_leading(region, "oss-")
-    }
+      credential: credential,
+      datetime: datetime
+    } = OSS4.prepare_sign_info_for_post_policy(at: now, config: config, region: region, bucket: bucket)
 
-    x_oss_signature_version = signature_version
-    x_oss_credential = build_credential(sign_args)
-    x_oss_date = utc_datetime_in_iso8601
-
-    raw_policy = %{
-      expiration: build_expiration(utc_datetime, seconds_to_expire),
+    post_policy = %PostPolicy{
+      expiration: build_expiration(now, seconds_to_expire),
       conditions: [
         %{bucket: bucket},
-        %{"x-oss-signature-version": x_oss_signature_version},
-        %{"x-oss-credential": x_oss_credential},
-        %{"x-oss-date": x_oss_date}
+        %{"x-oss-signature-version": signature_version},
+        %{"x-oss-credential": credential},
+        %{"x-oss-date": datetime}
         | conditions
       ]
     }
 
-    policy =
-      raw_policy
-      |> encode_json!()
-      |> base64()
+    %{post_policy: post_policy, signature: signature} =
+      OSS4.sign(post_policy, at: now, config: config, region: region, bucket: bucket)
 
     %{
-      policy: policy,
-      "x-oss-signature-version": x_oss_signature_version,
-      "x-oss-credential": x_oss_credential,
-      "x-oss-date": x_oss_date,
-      "x-oss-signature": sign({policy, sign_args})
+      policy: post_policy,
+      "x-oss-signature-version": signature_version,
+      "x-oss-credential": credential,
+      "x-oss-date": datetime,
+      "x-oss-signature": signature
     }
-  end
-
-  defp sign({policy, sign_args}) do
-    %{
-      config: %{access_key_secret: access_key_secret},
-      access_key_version: access_key_version,
-      request_version: request_version,
-      service: service,
-      region: region,
-      date: date
-    } = sign_args
-
-    "#{access_key_version}#{access_key_secret}"
-    |> hmac_sha256(date)
-    |> hmac_sha256(region)
-    |> hmac_sha256(service)
-    |> hmac_sha256(request_version)
-    |> hmac_sha256(policy)
-    |> base16()
-  end
-
-  defp build_credential(sign_args) do
-    %{
-      config: %{access_key_id: access_key_id},
-      request_version: request_version,
-      service: service,
-      region: region,
-      date: date
-    } = sign_args
-
-    Enum.join([access_key_id, date, region, service, request_version], "/")
   end
 
   defp build_expiration(%DateTime{} = start, seconds_to_expire) do

@@ -11,6 +11,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
 
   import CozyAliyunOpenAPI.Utils,
     only: [
+      encode_json!: 1,
       encode_rfc3986: 1,
       md5: 1,
       sha256: 1,
@@ -22,6 +23,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.EasyTime
   alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.Specs.OSS.Object.PostPolicy
   alias CozyAliyunOpenAPI.Sign
 
   @signature_version "OSS4-HMAC-SHA256"
@@ -46,7 +48,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     ctx = %{
       type: type,
       config: config,
-      region: String.trim_leading(region, "oss-"),
+      region: sanitize_region(region),
       bucket: bucket,
       datetime: datetime_in_iso8601,
       date: date_in_iso8601
@@ -57,6 +59,58 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     |> HTTPRequest.put_header("host", request.host)
     |> HTTPRequest.put_header("date", datetime_in_rfc1123)
     |> put_signature(ctx)
+  end
+
+  @impl true
+  def sign(%PostPolicy{} = post_policy,
+        at: %DateTime{} = at,
+        config: %Config{} = config,
+        region: region,
+        bucket: bucket
+      ) do
+    datetime_in_iso8601 = EasyTime.to_basic_iso8601(at)
+    date_in_iso8601 = DateTime.to_date(at) |> EasyTime.to_basic_iso8601()
+
+    ctx = %{
+      config: config,
+      region: sanitize_region(region),
+      bucket: bucket,
+      datetime: datetime_in_iso8601,
+      date: date_in_iso8601
+    }
+
+    %{
+      post_policy: build_string_to_sign(post_policy, ctx),
+      signature: build_signature(post_policy, ctx)
+    }
+  end
+
+  def prepare_sign_info_for_post_policy(
+        at: %DateTime{} = at,
+        config: %Config{} = config,
+        region: region,
+        bucket: bucket
+      ) do
+    datetime_in_iso8601 = EasyTime.to_basic_iso8601(at)
+    date_in_iso8601 = DateTime.to_date(at) |> EasyTime.to_basic_iso8601()
+
+    ctx = %{
+      config: config,
+      region: sanitize_region(region),
+      bucket: bucket,
+      datetime: datetime_in_iso8601,
+      date: date_in_iso8601
+    }
+
+    %{
+      signature_version: @signature_version,
+      credential: build_credential(ctx),
+      datetime: datetime_in_iso8601
+    }
+  end
+
+  defp sanitize_region(region) do
+    String.trim_leading(region, "oss-")
   end
 
   defp sanitize_headers!(request) do
@@ -83,7 +137,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
 
       content =
         [
-          "Credential=#{build_credential(request, ctx)}",
+          "Credential=#{build_credential(ctx)}",
           if(additional_headers != [], do: "AdditionalHeaders=#{additional_headers}", else: nil),
           "Signature=#{build_signature(request, ctx)}"
         ]
@@ -99,7 +153,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
 
     request
     |> HTTPRequest.put_query("x-oss-signature-version", @signature_version)
-    |> HTTPRequest.put_query("x-oss-credential", build_credential(request, ctx))
+    |> HTTPRequest.put_query("x-oss-credential", build_credential(ctx))
     |> HTTPRequest.put_query("x-oss-date", datetime)
     |> HTTPRequest.put_new_query("x-oss-expires", fn _request -> 3600 end)
     |> HTTPRequest.put_query("x-oss-additional-headers", &build_additional_headers(&1))
@@ -119,7 +173,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     end
   end
 
-  defp build_credential(_request, ctx) do
+  defp build_credential(ctx) do
     %{
       config: %{access_key_id: access_key_id},
       region: region,
@@ -129,7 +183,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     Enum.join([access_key_id, date, region, @service_name, @request_version], "/")
   end
 
-  defp build_signature(request, ctx) do
+  defp build_signature(request_or_post_policy, ctx) do
     %{
       config: %{access_key_secret: access_key_secret},
       date: date,
@@ -141,11 +195,11 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     |> hmac_sha256(region)
     |> hmac_sha256(@service_name)
     |> hmac_sha256(@request_version)
-    |> hmac_sha256(build_string_to_sign(request, ctx))
+    |> hmac_sha256(build_string_to_sign(request_or_post_policy, ctx))
     |> base16()
   end
 
-  defp build_string_to_sign(request, ctx) do
+  defp build_string_to_sign(%HTTPRequest{} = request, ctx) do
     %{date: date, region: region, datetime: datetime} = ctx
 
     scope = Enum.join([date, region, @service_name, @request_version], "/")
@@ -158,6 +212,13 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
       canonical_request |> sha256() |> base16()
     ]
     |> Enum.join("\n")
+  end
+
+  defp build_string_to_sign(%PostPolicy{} = post_policy, _ctx) do
+    post_policy
+    |> Map.from_struct()
+    |> encode_json!()
+    |> base64()
   end
 
   defp build_canonical_request(request, ctx) do
