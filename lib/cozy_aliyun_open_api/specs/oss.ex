@@ -271,7 +271,7 @@ defimpl HTTPRequest.Transform, for: OSS do
         body: body
       })
       |> HTTPRequest.put_header("host", host)
-      |> HTTPRequest.put_header_lazy("date", fn -> utc_datetime_in_rfc1123 end)
+      |> HTTPRequest.put_new_header("date", fn _request -> utc_datetime_in_rfc1123 end)
 
     sign_args = %{
       sign_type: sign_type,
@@ -297,8 +297,8 @@ defimpl HTTPRequest.Transform, for: OSS do
 
     request =
       request
-      |> HTTPRequest.put_header_lazy("content-md5", &build_content_md5(&1))
-      |> HTTPRequest.put_header_lazy("content-type", &detect_content_type(&1))
+      |> HTTPRequest.put_new_header("content-md5", &build_content_md5(&1))
+      |> HTTPRequest.put_new_header("content-type", &detect_content_type(&1))
       # x-oss-date is required, even if the documentation doesn't mention it ;)
       |> HTTPRequest.put_header("x-oss-date", datetime)
       |> HTTPRequest.put_header("x-oss-content-sha256", "UNSIGNED-PAYLOAD")
@@ -333,7 +333,7 @@ defimpl HTTPRequest.Transform, for: OSS do
       |> HTTPRequest.put_query("x-oss-signature-version", signature_version)
       |> HTTPRequest.put_query("x-oss-credential", build_credential({request, sign_args}))
       |> HTTPRequest.put_query("x-oss-date", datetime)
-      |> HTTPRequest.put_query_lazy("x-oss-expires", fn -> 3600 end)
+      |> HTTPRequest.put_new_query("x-oss-expires", fn _request -> 3600 end)
 
     # Set and use additional_headers after request is updated.
     sign_args = Map.put(sign_args, :additional_headers, extract_additional_headers(request))

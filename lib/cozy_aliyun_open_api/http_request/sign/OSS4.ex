@@ -74,8 +74,8 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4 do
     %{datetime: datetime} = ctx
 
     request
-    |> HTTPRequest.put_header_lazy("content-md5", &build_content_md5(&1))
-    |> HTTPRequest.put_header_lazy("content-type", &detect_content_type(&1))
+    |> HTTPRequest.put_new_header("content-md5", &build_content_md5(&1))
+    |> HTTPRequest.put_new_header("content-type", &detect_content_type(&1))
     |> HTTPRequest.put_header("x-oss-date", datetime)
     |> HTTPRequest.put_header("x-oss-content-sha256", build_hashed_payload(request))
     |> HTTPRequest.put_header("authorization", fn request ->
@@ -101,7 +101,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.OSS4 do
     |> HTTPRequest.put_query("x-oss-signature-version", @signature_version)
     |> HTTPRequest.put_query("x-oss-credential", build_credential(request, ctx))
     |> HTTPRequest.put_query("x-oss-date", datetime)
-    |> HTTPRequest.put_query_lazy("x-oss-expires", fn _request -> 3600 end)
+    |> HTTPRequest.put_new_query("x-oss-expires", fn _request -> 3600 end)
     |> HTTPRequest.put_query("x-oss-additional-headers", &build_additional_headers(&1))
     |> HTTPRequest.put_query("x-oss-signature", &build_signature(&1, ctx))
   end

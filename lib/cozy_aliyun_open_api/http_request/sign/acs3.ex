@@ -35,7 +35,7 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3 do
     |> HTTPRequest.put_header("host", request.host)
     |> HTTPRequest.put_header("x-acs-date", datetime)
     |> HTTPRequest.put_header("x-acs-content-sha256", build_hashed_payload(request))
-    |> HTTPRequest.put_header_lazy("x-acs-signature-nonce", fn _request -> random_string() end)
+    |> HTTPRequest.put_new_header("x-acs-signature-nonce", fn _request -> random_string() end)
     |> HTTPRequest.put_header("authorization", fn request -> build_authorization(request, config) end)
   end
 
