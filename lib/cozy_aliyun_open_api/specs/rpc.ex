@@ -2,6 +2,13 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
   @moduledoc """
   Describes an RPC style API.
 
+  APIs in the RPC style include:
+
+    * Elastic Compute Service (ECS)
+    * Content Delivery Network (CDN)
+    * ApsaraDB RDS
+    * ...
+
   ## Examples
 
       alias CozyAliyunOpenAPI.Config

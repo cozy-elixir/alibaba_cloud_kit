@@ -63,6 +63,20 @@ defmodule CozyAliyunOpenAPI do
   * `CozyAliyunOpenAPI.Specs.ROA`
   * `CozyAliyunOpenAPI.Specs.OSS`
 
+  > Q: Which spec should I use?
+  >
+  > A: First, you should check the style of the API you wanna use.
+  > See next section for more.
+
+  ## Check the styles of APIs
+
+  1. View the API style of a cloud service in the **List of operations by function**
+     topic of the API Reference for the service.
+  2. Search for the API of a cloud service in [OpenAPI Explorer](https://next.api.alibabacloud.com/). In the API
+     Debugging module, check the SDK sample code:
+     * If the sample code involves writing parameters to headers, the API is in the ROA style.
+     * Otherwise, the API is in the RPC style.
+
   ## About endpoints
 
   In official docs, the term *endpoint* refers to different things:

@@ -2,10 +2,15 @@ defmodule CozyAliyunOpenAPI.Specs.ROA do
   @moduledoc """
   Describes an ROA style API.
 
-  Read more at:
+  > ROA is a resource-oriented architectural style and an extension of
+  > the REST style.
 
-    * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method](https://www.alibabacloud.com/help/en/sdk/product-overview/request-structure-and-signature/)
-    * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method (zh-Hans)](https://help.aliyun.com/zh/sdk/product-overview/request-structure-and-signature/)
+  APIs in the RPC style include:
+
+    * Application Real-Time Monitoring Service (ARMS)
+    * Batch Compute, Container Service for Kubernetes (ACK)
+    * Elasticsearch
+    * ...
 
   """
 
