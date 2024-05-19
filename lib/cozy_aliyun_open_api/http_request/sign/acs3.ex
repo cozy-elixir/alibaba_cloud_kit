@@ -31,11 +31,23 @@ defmodule CozyAliyunOpenAPI.HTTPRequest.Sign.ACS3 do
     datetime = EasyTime.to_extended_iso8601(at)
 
     request
+    |> sanitize_headers!()
     |> HTTPRequest.put_header("host", request.host)
     |> HTTPRequest.put_header("x-acs-date", datetime)
     |> HTTPRequest.put_header("x-acs-content-sha256", build_hashed_payload(request))
-    |> HTTPRequest.put_header_lazy("x-acs-signature-nonce", fn _req -> random_string() end)
-    |> HTTPRequest.put_header("authorization", fn req -> build_authorization(req, config) end)
+    |> HTTPRequest.put_header_lazy("x-acs-signature-nonce", fn _request -> random_string() end)
+    |> HTTPRequest.put_header("authorization", fn request -> build_authorization(request, config) end)
+  end
+
+  defp sanitize_headers!(request) do
+    Map.update!(request, :headers, fn headers ->
+      Enum.into(headers, %{}, fn {k, v} ->
+        {
+          k |> Kernel.to_string() |> String.trim() |> String.downcase(),
+          v |> Kernel.to_string() |> String.trim()
+        }
+      end)
+    end)
   end
 
   defp build_authorization(request, config) do
