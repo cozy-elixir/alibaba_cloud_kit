@@ -7,10 +7,10 @@ defmodule FileStoreTest do
 
   setup do
     Application.put_env(:demo, FileStore,
-      access_key_id: System.fetch_env!("OSS_ACCESS_KEY_ID"),
-      access_key_secret: System.fetch_env!("OSS_ACCESS_KEY_SECRET"),
-      region: System.fetch_env!("OSS_REGION"),
-      bucket: System.fetch_env!("OSS_BUCKET")
+      access_key_id: System.fetch_env!("TEST_ACCESS_KEY_ID"),
+      access_key_secret: System.fetch_env!("TEST_ACCESS_KEY_SECRET"),
+      region: System.fetch_env!("TEST_OSS_REGION"),
+      bucket: System.fetch_env!("TEST_OSS_BUCKET")
     )
 
     :ok

@@ -11,12 +11,12 @@ defmodule CozyAliyunOpenAPI.Specs.OSS.ObjectTest do
   setup do
     config =
       Config.new!(%{
-        access_key_id: System.fetch_env!("OSS_ACCESS_KEY_ID"),
-        access_key_secret: System.fetch_env!("OSS_ACCESS_KEY_SECRET")
+        access_key_id: System.fetch_env!("TEST_ACCESS_KEY_ID"),
+        access_key_secret: System.fetch_env!("TEST_ACCESS_KEY_SECRET")
       })
 
-    region = System.fetch_env!("OSS_REGION")
-    bucket = System.fetch_env!("OSS_BUCKET")
+    region = System.fetch_env!("TEST_OSS_REGION")
+    bucket = System.fetch_env!("TEST_OSS_BUCKET")
 
     %{config: config, region: region, bucket: bucket}
   end
