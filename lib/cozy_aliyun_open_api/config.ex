@@ -17,20 +17,17 @@ defmodule CozyAliyunOpenAPI.Config do
   @enforce_keys [:access_key_id, :access_key_secret]
   defstruct @enforce_keys
 
-  @type config() :: %{
-          access_key_id: String.t(),
-          access_key_secret: String.t()
-        }
+  @type opt :: {:access_key_id, String.t()} | {:access_key_secret, String.t()}
+  @type opts :: [opt()]
 
   @type t :: %__MODULE__{
           access_key_id: String.t(),
           access_key_secret: String.t()
         }
 
-  @spec new!(config()) :: t()
-  def new!(%{} = config) do
-    config
-    |> Map.to_list()
+  @spec new!(opts()) :: t()
+  def new!(opts) when is_list(opts) do
+    opts
     |> NimbleOptions.validate!(@config_schema)
     |> then(&struct(__MODULE__, &1))
   end

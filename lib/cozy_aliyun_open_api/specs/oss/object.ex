@@ -26,10 +26,10 @@ defmodule CozyAliyunOpenAPI.Specs.OSS.Object do
   ## Examples
 
       config =
-        Config.new!(%{
+        Config.new!(
           access_key_id: "...",
           access_key_secret: "..."
-        })
+        )
 
       region = "oss-us-west-1"
       bucket = "example-bucket"

@@ -7,10 +7,10 @@ defmodule CozyAliyunOpenAPI.Sign.ACS3Test do
 
   test "sign/2" do
     config =
-      Config.new!(%{
+      Config.new!(
         access_key_id: "YourAccessKeyId",
         access_key_secret: "YourAccessKeySecret"
-      })
+      )
 
     request =
       HTTPRequest.new!(%{

@@ -26,41 +26,41 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
   @typedoc """
   Request scheme.
   """
-  @type scheme() :: String.t()
+  @type scheme :: String.t()
 
   @typedoc """
   Request host.
   """
-  @type host() :: String.t()
+  @type host :: String.t()
 
   @typedoc """
   Request method.
   """
-  @type method() :: String.t()
+  @type method :: String.t()
 
   @typedoc """
   Request path.
   """
-  @type path() :: String.t()
+  @type path :: String.t()
 
   @typedoc """
   Optional request query.
   """
-  @type query() :: %{
+  @type query :: %{
           optional(name :: String.t()) => value :: boolean() | number() | String.t()
         }
 
   @typedoc """
   Request headers.
   """
-  @type headers() :: %{
+  @type headers :: %{
           optional(name :: String.t()) => value :: String.t()
         }
 
   @typedoc """
   Optional request body.
   """
-  @type body() :: iodata() | nil
+  @type body :: iodata() | nil
 
   @type t :: %__MODULE__{
           scheme: scheme(),
@@ -77,15 +77,10 @@ defmodule CozyAliyunOpenAPI.HTTPRequest do
   Creates an HTTP request struct.
   """
   def new!(%{} = args) do
-    args
-    |> as_struct!()
-  end
-
-  defp as_struct!(map) do
     default_struct = __MODULE__.__struct__()
     valid_keys = Map.keys(default_struct)
-    map = Map.take(map, valid_keys)
-    Map.merge(default_struct, map)
+    args = Map.take(args, valid_keys)
+    Map.merge(default_struct, args)
   end
 
   @doc """

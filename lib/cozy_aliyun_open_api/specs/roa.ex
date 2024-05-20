@@ -21,7 +21,7 @@ defmodule CozyAliyunOpenAPI.Specs.ROA do
   @type t :: %__MODULE__{}
 
   @spec new!(Config.t(), map()) :: t()
-  def new!(%Config{} = _config, %{} = _spec_config) do
+  def new!(%Config{} = _config, %{} = _spec_opts) do
     raise RuntimeError, "ROA style API is not supported for now"
   end
 end

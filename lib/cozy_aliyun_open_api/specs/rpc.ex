@@ -15,12 +15,12 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
       alias CozyAliyunOpenAPI.Specs.RPC
 
       config =
-        Config.new!(%{
+        Config.new!(
           access_key_id: "...",
           access_key_secret: "..."
-        })
+        )
 
-      RPC.new!(config, %{
+      RPC.new!(config,
         endpoint: "https://ecs-cn-hangzhou.aliyuncs.com/",
         method: :post,
         version: "2015-11-23",
@@ -28,13 +28,13 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
         params: %{
           "RegionId" => "cn-hangzhou"
         }
-      })
+      )
 
   """
 
   alias CozyAliyunOpenAPI.Config
 
-  @spec_config_schema [
+  @spec_opts_schema [
     endpoint: [
       type: :string,
       required: true
@@ -73,28 +73,28 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
 
   defstruct @enforce_keys
 
-  @type endpoint() :: String.t()
-  @type method() :: :get | :post
-  @type headers() :: %{
+  @type endpoint :: String.t()
+  @type method :: :get | :post
+  @type headers :: %{
           optional(name :: String.t()) => value :: nil | boolean() | number() | String.t()
         }
 
-  @type version() :: String.t()
-  @type action() :: String.t()
-  @type params() ::
+  @type version :: String.t()
+  @type action :: String.t()
+  @type params ::
           %{
             optional(name :: String.t()) => value :: nil | boolean() | number() | String.t()
           }
           | nil
 
-  @type spec_config() :: %{
-          endpoint: endpoint(),
-          method: method(),
-          headers: headers(),
-          version: version(),
-          action: action(),
-          params: params()
-        }
+  @type spec_opt ::
+          {:endpoint, endpoint()}
+          | {:method, method()}
+          | {:headers, headers()}
+          | {:version, version()}
+          | {:action, action()}
+          | {:params, params()}
+  @type spec_opts :: [spec_opt()]
 
   @type t :: %__MODULE__{
           config: Config.t(),
@@ -106,14 +106,11 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
           params: params()
         }
 
-  @spec new!(Config.t(), spec_config()) :: t()
-  def new!(%Config{} = config, %{} = spec_config) do
-    spec_config =
-      spec_config
-      |> Map.to_list()
-      |> NimbleOptions.validate!(@spec_config_schema)
-
-    struct(__MODULE__, spec_config)
+  @spec new!(Config.t(), spec_opts()) :: t()
+  def new!(%Config{} = config, spec_opts) do
+    spec_opts
+    |> NimbleOptions.validate!(@spec_opts_schema)
+    |> then(&struct(__MODULE__, &1))
     |> put_config(config)
   end
 

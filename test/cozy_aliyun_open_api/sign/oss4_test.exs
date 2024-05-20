@@ -7,10 +7,10 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4Test do
 
   setup do
     config =
-      Config.new!(%{
+      Config.new!(
         access_key_id: "accesskeyid",
         access_key_secret: "accesskeysecret"
-      })
+      )
 
     %{config: config}
   end

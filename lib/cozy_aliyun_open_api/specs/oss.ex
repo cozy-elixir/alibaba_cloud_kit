@@ -7,9 +7,9 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
     * [Object Storage Service > Developer Reference > Use the RESTful API to initiate requests](https://www.alibabacloud.com/help/en/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
     * [Object Storage Service > Developer Reference > Use the RESTful API to initiate requests (zh-Hans)](https://help.aliyun.com/zh/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
 
-  ## About `spec_config`
+  ## About `spec_opts`
 
-  `spec_config` is a plain map for describing a RESTful API request.
+  `spec_opts` is a plain map for describing a RESTful API request.
 
   ### Adding signature
 
@@ -36,18 +36,18 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
       alias CozyAliyunOpenAPI.HTTPClient
 
       config =
-        Config.new!(%{
+        Config.new!(
           access_key_id: "...",
           access_key_secret: "..."
-        })
+        )
 
-      OSS.new!(config, %{
+      OSS.new!(config,
         sign_type: :header,
         region: "oss-us-west-1",
         endpoint: "https://oss-us-west-1.aliyuncs.com/",
         method: :get,
         path: "/"
-      })
+      )
       |> HTTPRequest.from_spec!()
       |> HTTPClient.request()
 
@@ -58,12 +58,12 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
       alias CozyAliyunOpenAPI.HTTPRequest
 
       config =
-        Config.new!(%{
+        Config.new!(
           access_key_id: "...",
           access_key_secret: "..."
-        })
+        )
 
-      OSS.new!(config, %{
+      OSS.new!(config,
         sign_type: :url,
         region: "oss-us-west-1",
         bucket: "example-bucket",
@@ -73,7 +73,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
         headers: %{
           "x-oss-expires" => 900
         }
-      })
+      )
       |> HTTPRequest.from_spec!()
       |> HTTPRequest.url()
 
@@ -81,7 +81,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
 
   alias CozyAliyunOpenAPI.Config
 
-  @spec_config_schema [
+  @spec_opts_schema [
     region: [
       type: :string,
       required: true
@@ -135,9 +135,9 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
 
   defstruct @enforce_keys
 
-  @type region() :: String.t()
-  @type bucket() :: String.t() | nil
-  @type sign_type() :: :header | :url
+  @type region :: String.t()
+  @type bucket :: String.t() | nil
+  @type sign_type :: :header | :url
 
   @typedoc """
   The base url that the request is sent to.
@@ -150,29 +150,29 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
     * ...
 
   """
-  @type endpoint() :: String.t()
+  @type endpoint :: String.t()
 
-  @type method() :: String.t()
-  @type path() :: String.t()
-  @type query() :: %{
+  @type method :: String.t()
+  @type path :: String.t()
+  @type query :: %{
           optional(name :: String.t()) => value :: nil | boolean() | number() | String.t()
         }
-  @type headers() :: %{
+  @type headers :: %{
           optional(name :: String.t()) => value :: nil | boolean() | number() | String.t()
         }
-  @type body() :: iodata() | nil
+  @type body :: iodata() | nil
 
-  @type spec_config() :: %{
-          region: region(),
-          bucket: bucket(),
-          sign_type: sign_type(),
-          endpoint: endpoint(),
-          method: method(),
-          path: path(),
-          query: query(),
-          headers: headers(),
-          body: body()
-        }
+  @type spec_opt ::
+          {:region, region()}
+          | {:bucket, bucket()}
+          | {:sign_type, sign_type()}
+          | {:endpoint, endpoint()}
+          | {:method, method()}
+          | {:path, path()}
+          | {:query, query()}
+          | {:headers, headers()}
+          | {:body, body()}
+  @type spec_opts :: [spec_opt()]
 
   @type t :: %__MODULE__{
           config: Config.t(),
@@ -187,14 +187,11 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
           body: body()
         }
 
-  @spec new!(Config.t(), spec_config()) :: t()
-  def new!(%Config{} = config, %{} = spec_config) do
-    spec_config =
-      spec_config
-      |> Map.to_list()
-      |> NimbleOptions.validate!(@spec_config_schema)
-
-    struct(__MODULE__, spec_config)
+  @spec new!(Config.t(), spec_opts()) :: t()
+  def new!(%Config{} = config, spec_opts) when is_list(spec_opts) do
+    spec_opts
+    |> NimbleOptions.validate!(@spec_opts_schema)
+    |> then(&struct(__MODULE__, &1))
     |> put_config(config)
     |> normalize_path!()
   end

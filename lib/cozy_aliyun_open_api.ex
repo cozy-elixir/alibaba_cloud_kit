@@ -20,13 +20,13 @@ defmodule CozyAliyunOpenAPI do
 
       # 1. create a config
       config =
-        Config.new!(%{
+        Config.new!(
           access_key_id: "...",
           access_key_secret: "..."
-        })
+        )
 
       # 2. create a spec
-      RPC.new!(config, %{
+      RPC.new!(config,
         method: :post,
         endpoint: "https://ecs-cn-hangzhou.aliyuncs.com/",
         shared_params: %{
@@ -36,7 +36,7 @@ defmodule CozyAliyunOpenAPI do
         params: %{
           "RegionId" => "cn-hangzhou"
         }
-      })
+      )
       # 3. transform the spec to a HTTP request
       |> HTTPRequest.from_spec!()
       # 4. send the HTTP request

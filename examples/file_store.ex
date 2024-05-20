@@ -11,7 +11,7 @@ defmodule FileStore do
 
   def put_file(path, data) when is_binary(path) and is_binary(data) do
     response =
-      OSS.new!(config(), %{
+      OSS.new!(config(),
         sign_type: :header,
         region: region(),
         bucket: bucket(),
@@ -19,7 +19,7 @@ defmodule FileStore do
         method: :put,
         path: path,
         body: data
-      })
+      )
       |> HTTPRequest.from_spec!()
       |> HTTPClient.request()
 
@@ -30,14 +30,14 @@ defmodule FileStore do
 
   def get_file(path) when is_binary(path) do
     response =
-      OSS.new!(config(), %{
+      OSS.new!(config(),
         sign_type: :header,
         region: region(),
         bucket: bucket(),
         endpoint: endpoint(),
         method: :get,
         path: path
-      })
+      )
       |> HTTPRequest.from_spec!()
       |> HTTPClient.request()
 
@@ -48,14 +48,14 @@ defmodule FileStore do
 
   def delete_file(path) when is_binary(path) do
     response =
-      OSS.new!(config(), %{
+      OSS.new!(config(),
         sign_type: :header,
         region: region(),
         bucket: bucket(),
         endpoint: endpoint(),
         method: :delete,
         path: path
-      })
+      )
       |> HTTPRequest.from_spec!()
       |> HTTPClient.request()
 
@@ -65,7 +65,7 @@ defmodule FileStore do
   end
 
   def get_access_url(path) when is_binary(path) do
-    OSS.new!(config(), %{
+    OSS.new!(config(),
       sign_type: :url,
       region: region(),
       bucket: bucket(),
@@ -75,7 +75,7 @@ defmodule FileStore do
       query: %{
         "x-oss-expires" => 300
       }
-    })
+    )
     |> HTTPRequest.from_spec!()
     |> HTTPRequest.url()
   end
@@ -119,7 +119,6 @@ defmodule FileStore do
     :demo
     |> Application.fetch_env!(__MODULE__)
     |> Keyword.take([:access_key_id, :access_key_secret])
-    |> Enum.into(%{})
     |> Config.new!()
   end
 

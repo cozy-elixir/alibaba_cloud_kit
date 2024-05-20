@@ -13,10 +13,10 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
   describe "Turning an OSS spec as an HTTP request" do
     setup do
       config =
-        Config.new!(%{
+        Config.new!(
           access_key_id: System.fetch_env!("TEST_ACCESS_KEY_ID"),
           access_key_secret: System.fetch_env!("TEST_ACCESS_KEY_SECRET")
-        })
+        )
 
       region = System.fetch_env!("TEST_OSS_REGION")
       bucket = System.fetch_env!("TEST_OSS_BUCKET")
@@ -29,12 +29,12 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       region: region
     } do
       assert {:ok, 200, _header, _body} =
-               OSS.new!(config, %{
+               OSS.new!(config,
                  region: region,
                  endpoint: "https://#{region}.aliyuncs.com/",
                  method: :get,
                  path: "/"
-               })
+               )
                |> HTTPRequest.from_spec!()
                |> HTTPClient.request()
     end
@@ -44,13 +44,13 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       region: region
     } do
       assert {:ok, 200, _header, _body} =
-               OSS.new!(config, %{
+               OSS.new!(config,
                  region: region,
                  endpoint: "https://#{region}.aliyuncs.com/",
                  method: :get,
                  path: "/",
                  query: %{"regions" => nil}
-               })
+               )
                |> HTTPRequest.from_spec!()
                |> HTTPClient.request()
     end
@@ -61,14 +61,14 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       bucket: bucket
     } do
       assert {:ok, 200, _header, _body} =
-               OSS.new!(config, %{
+               OSS.new!(config,
                  region: region,
                  bucket: bucket,
                  endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
                  method: :get,
                  path: "/",
                  query: %{"list-type" => 2}
-               })
+               )
                |> HTTPRequest.from_spec!()
                |> HTTPClient.request()
     end
@@ -79,14 +79,14 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       bucket: bucket
     } do
       assert {:ok, 200, _header, _body} =
-               OSS.new!(config, %{
+               OSS.new!(config,
                  region: region,
                  bucket: bucket,
                  endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
                  method: :put,
                  path: "/oss/put_object.png",
                  body: @example_image_binary
-               })
+               )
                |> HTTPRequest.from_spec!()
                |> HTTPClient.request()
     end
@@ -97,14 +97,14 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       bucket: bucket
     } do
       assert {:ok, 200, _header, _body} =
-               OSS.new!(config, %{
+               OSS.new!(config,
                  region: region,
                  bucket: bucket,
                  endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
                  method: :get,
                  path: "/",
                  query: %{"live" => nil}
-               })
+               )
                |> HTTPRequest.from_spec!()
                |> HTTPClient.request()
     end
@@ -113,10 +113,10 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
   describe "Turning an OSS spec as an HTTP url" do
     setup do
       config =
-        Config.new!(%{
+        Config.new!(
           access_key_id: System.fetch_env!("TEST_ACCESS_KEY_ID"),
           access_key_secret: System.fetch_env!("TEST_ACCESS_KEY_SECRET")
-        })
+        )
 
       region = System.fetch_env!("TEST_OSS_REGION")
       bucket = System.fetch_env!("TEST_OSS_BUCKET")
@@ -130,14 +130,14 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       bucket: bucket
     } do
       url =
-        OSS.new!(config, %{
+        OSS.new!(config,
           sign_type: :url,
           region: region,
           bucket: bucket,
           endpoint: "https://#{bucket}.#{region}.aliyuncs.com/",
           method: :get,
           path: "/oss/get_object.png"
-        })
+        )
         |> HTTPRequest.from_spec!()
         |> HTTPRequest.url()
 

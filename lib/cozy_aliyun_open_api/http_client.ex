@@ -24,7 +24,7 @@ defmodule CozyAliyunOpenAPI.HTTPClient do
   @typedoc """
   The response of a request.
   """
-  @type response() :: {:ok, status, headers, body} | {:error, term()}
+  @type response :: {:ok, status, headers, body} | {:error, term()}
 
   @doc """
   Callback to initialize the given API client.
