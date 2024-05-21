@@ -2,11 +2,8 @@ defmodule CozyAliyunOpenAPI.HTTPClient.Finch do
   @moduledoc """
   Finch-based HTTP client.
 
-      config :cozy_aliyun_open_api,
-        http_client: CozyAliyunOpenAPI.HTTPClient.Finch
-
-  In order to use `Finch` as the HTTP client, you must start `Finch` and provide a `:name`.
-  Often in your supervision tree:
+  In order to use `Finch` as the HTTP client, you must start `Finch` and
+  provide a `:name`. Often in your supervision tree:
 
       children = [
         {Finch, name: CozyAliyunOpenAPI.Finch}
@@ -16,11 +13,10 @@ defmodule CozyAliyunOpenAPI.HTTPClient.Finch do
 
       Finch.start_link(name: CozyAliyunOpenAPI.Finch)
 
-  If a name different from `CozyAliyunOpenAPI.Finch` is used, or you want to use an existing
-  `Finch` instance, you can provide the name via the config:
+  If a name different from `CozyAliyunOpenAPI.Finch` is used, or you want to
+  use an existing `Finch` instance, you can provide the name via the config:
 
       config :cozy_aliyun_open_api,
-        http_client: CozyAliyunOpenAPI.HTTPClient.Finch
         finch_name: MyApp.Finch
 
   """

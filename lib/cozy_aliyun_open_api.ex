@@ -11,7 +11,21 @@ defmodule CozyAliyunOpenAPI do
   3. transforming the spec to a HTTP request.
   4. sending the HTTP request.
 
-  ## An example
+  ## Quick start
+
+  Add necessary packages:
+
+      {:cozy_aliyun_open_api, "~> 0.4"},
+      {:finch, "~> 0.18"},
+      {:sax_map, "~> 1.0"},
+
+  Start a Finch child in your supervision tree:
+
+      children = [
+        {Finch, name: CozyAliyunOpenAPI.Finch}
+      ]
+
+  Make a request:
 
       alias CozyAliyunOpenAPI.Config
       alias CozyAliyunOpenAPI.Specs.RPC
