@@ -1,7 +1,7 @@
-defmodule CozyAliyunOpenAPI.HTTPClientTest do
+defmodule CozyAliyunOpenAPI.HTTP.ClientTest do
   use ExUnit.Case
-  alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPClient
+  alias CozyAliyunOpenAPI.HTTP.Request
+  alias CozyAliyunOpenAPI.HTTP.Client
 
   test "creates and requests an HTTP request" do
     assert {:ok, 200, _, _} =
@@ -12,7 +12,7 @@ defmodule CozyAliyunOpenAPI.HTTPClientTest do
                method: :get,
                path: "/headers"
              }
-             |> HTTPRequest.new!()
-             |> HTTPClient.request()
+             |> Request.new!()
+             |> Client.request()
   end
 end

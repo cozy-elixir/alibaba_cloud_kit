@@ -1,4 +1,4 @@
-defmodule CozyAliyunOpenAPI.HTTPRequest do
+defmodule CozyAliyunOpenAPI.HTTP.Request do
   @moduledoc """
   A struct representing an HTTP request.
   """

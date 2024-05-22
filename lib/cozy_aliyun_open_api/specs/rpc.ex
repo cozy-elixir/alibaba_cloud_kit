@@ -117,12 +117,12 @@ defmodule CozyAliyunOpenAPI.Specs.RPC do
   defp put_config(struct, config), do: Map.put(struct, :config, config)
 end
 
-defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
+defimpl CozyAliyunOpenAPI.HTTP.Request.Transform,
   for: CozyAliyunOpenAPI.Specs.RPC do
   import CozyAliyunOpenAPI.Utils, only: [parse_base_url: 1]
   alias CozyAliyunOpenAPI.EasyTime
   alias CozyAliyunOpenAPI.Specs.RPC
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
   alias CozyAliyunOpenAPI.Sign.ACS3
 
   def to_request!(%RPC{method: :get} = rpc) do
@@ -140,7 +140,7 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
 
     %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
 
-    HTTPRequest.new!(%{
+    Request.new!(%{
       scheme: scheme,
       host: host,
       port: port,
@@ -149,8 +149,8 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
       query: params,
       headers: headers
     })
-    |> HTTPRequest.put_header("x-acs-version", version)
-    |> HTTPRequest.put_header("x-acs-action", action)
+    |> Request.put_header("x-acs-version", version)
+    |> Request.put_header("x-acs-action", action)
     |> ACS3.sign(at: now, config: config)
   end
 
@@ -169,7 +169,7 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
 
     %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
 
-    HTTPRequest.new!(%{
+    Request.new!(%{
       scheme: scheme,
       host: host,
       port: port,
@@ -177,15 +177,15 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
       path: "/",
       headers: headers
     })
-    |> HTTPRequest.put_header("x-acs-version", version)
-    |> HTTPRequest.put_header("x-acs-action", action)
+    |> Request.put_header("x-acs-version", version)
+    |> Request.put_header("x-acs-action", action)
     |> put_post_params(params)
     |> ACS3.sign(at: now, config: config)
   end
 
   defp put_post_params(%{method: :post} = request, params) do
     request
-    |> HTTPRequest.put_header("content-type", "application/x-www-form-urlencoded")
-    |> HTTPRequest.put_body(URI.encode_query(params, :www_form))
+    |> Request.put_header("content-type", "application/x-www-form-urlencoded")
+    |> Request.put_body(URI.encode_query(params, :www_form))
   end
 end

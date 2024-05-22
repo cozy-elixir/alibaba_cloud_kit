@@ -1,20 +1,20 @@
-defmodule CozyAliyunOpenAPI.HTTPClient do
+defmodule CozyAliyunOpenAPI.HTTP.Client do
   @moduledoc """
   The specification for a HTTP client.
 
   It can be set to a client provided by `CozyAliyunOpenAPI`, such as:
 
       config :cozy_aliyun_open_api,
-        http_client: CozyAliyunOpenAPI.HTTPClient.Finch
+        http_client: CozyAliyunOpenAPI.HTTP.Client.Finch
 
   Or, set it to your own API client, such as:
 
       config :cozy_aliyun_open_api,
-        http_client: MyHTTPClient
+        http_client: MyHTTP.Client
 
   """
 
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
 
   @type status :: pos_integer()
   @type headers :: [{binary(), binary()}]
@@ -33,7 +33,7 @@ defmodule CozyAliyunOpenAPI.HTTPClient do
   @doc """
   Callback to send a request.
   """
-  @callback request(HTTPRequest.t()) :: response()
+  @callback request(Request.t()) :: response()
 
   @optional_callbacks init: 0
 
@@ -59,8 +59,8 @@ defmodule CozyAliyunOpenAPI.HTTPClient do
   this function will try to convert the body to a map with snaked-cased
   keys.
   """
-  @spec request(HTTPRequest.t()) :: response()
-  def request(%HTTPRequest{} = request) do
+  @spec request(Request.t()) :: response()
+  def request(%Request{} = request) do
     request
     |> http_client().request()
   end

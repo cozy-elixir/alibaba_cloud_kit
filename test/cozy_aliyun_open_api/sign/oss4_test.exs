@@ -2,7 +2,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4Test do
   use ExUnit.Case
 
   alias CozyAliyunOpenAPI.Config
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
   alias CozyAliyunOpenAPI.Sign.OSS4
 
   setup do
@@ -17,7 +17,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4Test do
 
   test "sign/2 with :header type", %{config: config} do
     request =
-      HTTPRequest.new!(%{
+      Request.new!(%{
         scheme: "https",
         host: "examplebucket.oss-cn-hangzhou.aliyuncs.com",
         port: 443,
@@ -33,7 +33,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4Test do
         body: nil
       })
 
-    assert %CozyAliyunOpenAPI.HTTPRequest{
+    assert %Request{
              scheme: "https",
              host: "examplebucket.oss-cn-hangzhou.aliyuncs.com",
              port: 443,
@@ -65,7 +65,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4Test do
 
   test "sign/2 with :url type", %{config: config} do
     request =
-      HTTPRequest.new!(%{
+      Request.new!(%{
         scheme: "https",
         host: "examplebucket.oss-cn-hangzhou.aliyuncs.com",
         port: 443,
@@ -81,7 +81,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4Test do
         body: nil
       })
 
-    assert %CozyAliyunOpenAPI.HTTPRequest{
+    assert %Request{
              scheme: "https",
              host: "examplebucket.oss-cn-hangzhou.aliyuncs.com",
              port: 443,

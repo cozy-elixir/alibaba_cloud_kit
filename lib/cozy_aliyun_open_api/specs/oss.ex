@@ -32,8 +32,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
 
       alias CozyAliyunOpenAPI.Config
       alias CozyAliyunOpenAPI.Specs.OSS
-      alias CozyAliyunOpenAPI.HTTPRequest
-      alias CozyAliyunOpenAPI.HTTPClient
+      alias CozyAliyunOpenAPI.HTTP.Request
+      alias CozyAliyunOpenAPI.HTTP.Client
 
       config =
         Config.new!(
@@ -48,14 +48,14 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
         method: :get,
         path: "/"
       )
-      |> HTTPRequest.from_spec!()
-      |> HTTPClient.request()
+      |> Request.from_spec!()
+      |> Client.request()
 
   ### Create a pre-signed url for `GetObject` operation
 
       alias CozyAliyunOpenAPI.Config
       alias CozyAliyunOpenAPI.Specs.OSS
-      alias CozyAliyunOpenAPI.HTTPRequest
+      alias CozyAliyunOpenAPI.HTTP.Request
 
       config =
         Config.new!(
@@ -74,8 +74,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
           "x-oss-expires" => 900
         }
       )
-      |> HTTPRequest.from_spec!()
-      |> HTTPRequest.url()
+      |> Request.from_spec!()
+      |> Request.url()
 
   """
 
@@ -203,12 +203,12 @@ defmodule CozyAliyunOpenAPI.Specs.OSS do
   end
 end
 
-defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
+defimpl CozyAliyunOpenAPI.HTTP.Request.Transform,
   for: CozyAliyunOpenAPI.Specs.OSS do
   import CozyAliyunOpenAPI.Utils, only: [parse_base_url: 1]
   alias CozyAliyunOpenAPI.EasyTime
   alias CozyAliyunOpenAPI.Specs.OSS
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
   alias CozyAliyunOpenAPI.Sign.OSS4
 
   def to_request!(%OSS{} = oss) do
@@ -229,7 +229,7 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
 
     %{scheme: scheme, host: host, port: port} = parse_base_url(endpoint)
 
-    HTTPRequest.new!(%{
+    Request.new!(%{
       scheme: scheme,
       host: host,
       port: port,
@@ -239,8 +239,8 @@ defimpl CozyAliyunOpenAPI.HTTPRequest.Transform,
       headers: headers,
       body: body
     })
-    |> HTTPRequest.put_header("host", host)
-    |> HTTPRequest.put_new_header("date", fn _request -> EasyTime.to_rfc1123(now) end)
+    |> Request.put_header("host", host)
+    |> Request.put_new_header("date", fn _request -> EasyTime.to_rfc1123(now) end)
     |> OSS4.sign(at: now, type: type, config: config, region: region, bucket: bucket)
   end
 end

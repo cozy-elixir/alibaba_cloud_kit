@@ -3,8 +3,8 @@ defmodule CozyAliyunOpenAPI.Specs.RPCTest do
 
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.Specs.RPC
-  alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPClient
+  alias CozyAliyunOpenAPI.HTTP.Request
+  alias CozyAliyunOpenAPI.HTTP.Client
 
   setup do
     config =
@@ -26,8 +26,8 @@ defmodule CozyAliyunOpenAPI.Specs.RPCTest do
                  action: "DescribeInstanceStatus",
                  params: %{"RegionId" => "cn-hangzhou"}
                )
-               |> HTTPRequest.from_spec!()
-               |> HTTPClient.request()
+               |> Request.from_spec!()
+               |> Client.request()
     end
 
     test "works for POST method", %{config: config} do
@@ -39,8 +39,8 @@ defmodule CozyAliyunOpenAPI.Specs.RPCTest do
                  action: "DescribeInstanceStatus",
                  params: %{"RegionId" => "cn-hangzhou"}
                )
-               |> HTTPRequest.from_spec!()
-               |> HTTPClient.request()
+               |> Request.from_spec!()
+               |> Client.request()
     end
   end
 end

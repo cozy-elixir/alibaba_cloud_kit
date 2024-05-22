@@ -29,8 +29,8 @@ defmodule CozyAliyunOpenAPI do
 
       alias CozyAliyunOpenAPI.Config
       alias CozyAliyunOpenAPI.Specs.RPC
-      alias CozyAliyunOpenAPI.HTTPRequest
-      alias CozyAliyunOpenAPI.HTTPClient
+      alias CozyAliyunOpenAPI.HTTP.Request
+      alias CozyAliyunOpenAPI.HTTP.Client
 
       # 1. create a config
       config =
@@ -52,9 +52,9 @@ defmodule CozyAliyunOpenAPI do
         }
       )
       # 3. transform the spec to a HTTP request
-      |> HTTPRequest.from_spec!()
+      |> Request.from_spec!()
       # 4. send the HTTP request
-      |> HTTPClient.request()
+      |> Client.request()
 
   > In order to accommodate as many different usage scenarios as possible,
   > `#{inspect(__MODULE__)}` provides only low-level APIs.

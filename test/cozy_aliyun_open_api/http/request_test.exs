@@ -1,11 +1,11 @@
-defmodule CozyAliyunOpenAPI.HTTPRequestTest do
+defmodule CozyAliyunOpenAPI.HTTP.RequestTest do
   use ExUnit.Case
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
 
   describe "new!/2" do
     test "creates an HTTP request struct" do
-      assert %HTTPRequest{} =
-               HTTPRequest.new!(%{
+      assert %Request{} =
+               Request.new!(%{
                  scheme: :https,
                  host: "example.com",
                  port: 443,

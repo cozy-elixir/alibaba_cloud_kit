@@ -27,7 +27,7 @@ defmodule CozyAliyunOpenAPI.MixProject do
     [
       extra_applications: [:logger, :crypto],
       mod: {CozyAliyunOpenAPI.Application, []},
-      env: [json_library: Jason, http_client: CozyAliyunOpenAPI.HTTPClient.Finch]
+      env: [json_library: Jason, http_client: CozyAliyunOpenAPI.HTTP.Client.Finch]
     ]
   end
 

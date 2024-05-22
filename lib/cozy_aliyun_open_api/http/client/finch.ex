@@ -1,4 +1,4 @@
-defmodule CozyAliyunOpenAPI.HTTPClient.Finch do
+defmodule CozyAliyunOpenAPI.HTTP.Client.Finch do
   @moduledoc """
   Finch-based HTTP client.
 
@@ -22,9 +22,9 @@ defmodule CozyAliyunOpenAPI.HTTPClient.Finch do
   """
 
   require Logger
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
 
-  @behaviour CozyAliyunOpenAPI.HTTPClient
+  @behaviour CozyAliyunOpenAPI.HTTP.Client
 
   @impl true
   def init do
@@ -39,7 +39,7 @@ defmodule CozyAliyunOpenAPI.HTTPClient.Finch do
       Or set your own HTTP client:
 
           config :cozy_aliyun_open_api,
-            http_client: MyHTTPClient
+            http_client: MyHTTP.Client
 
       """)
 
@@ -51,7 +51,7 @@ defmodule CozyAliyunOpenAPI.HTTPClient.Finch do
   end
 
   @impl true
-  def request(%HTTPRequest{} = req) do
+  def request(%Request{} = req) do
     method = build_method(req)
     url = build_url(req)
     headers = build_headers(req)

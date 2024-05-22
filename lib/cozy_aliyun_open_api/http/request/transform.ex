@@ -1,6 +1,6 @@
-defprotocol CozyAliyunOpenAPI.HTTPRequest.Transform do
+defprotocol CozyAliyunOpenAPI.HTTP.Request.Transform do
   @moduledoc """
-  The protocol for transforming a spec to an HTTP request.
+  The protocol for transforming a spec to an `%HTTP.Request{}`.
   """
 
   @doc """

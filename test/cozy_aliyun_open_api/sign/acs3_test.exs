@@ -2,7 +2,7 @@ defmodule CozyAliyunOpenAPI.Sign.ACS3Test do
   use ExUnit.Case
 
   alias CozyAliyunOpenAPI.Config
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
   alias CozyAliyunOpenAPI.Sign.ACS3
 
   test "sign/2" do
@@ -13,7 +13,7 @@ defmodule CozyAliyunOpenAPI.Sign.ACS3Test do
       )
 
     request =
-      HTTPRequest.new!(%{
+      Request.new!(%{
         scheme: "https",
         host: "ecs.cn-shanghai.aliyuncs.com",
         port: 443,
@@ -30,7 +30,7 @@ defmodule CozyAliyunOpenAPI.Sign.ACS3Test do
         }
       })
 
-    assert %CozyAliyunOpenAPI.HTTPRequest{
+    assert %Request{
              scheme: "https",
              host: "ecs.cn-shanghai.aliyuncs.com",
              port: 443,

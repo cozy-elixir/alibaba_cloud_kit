@@ -6,8 +6,8 @@ defmodule FileStore do
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.Specs.OSS
   alias CozyAliyunOpenAPI.Specs.OSS.Object
-  alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPClient
+  alias CozyAliyunOpenAPI.HTTP.Request
+  alias CozyAliyunOpenAPI.HTTP.Client
 
   def put_file(path, data) when is_binary(path) and is_binary(data) do
     response =
@@ -20,8 +20,8 @@ defmodule FileStore do
         path: path,
         body: data
       )
-      |> HTTPRequest.from_spec!()
-      |> HTTPClient.request()
+      |> Request.from_spec!()
+      |> Client.request()
 
     with {:ok, 200, _headers, _body} <- response do
       {:ok, path}
@@ -38,8 +38,8 @@ defmodule FileStore do
         method: :get,
         path: path
       )
-      |> HTTPRequest.from_spec!()
-      |> HTTPClient.request()
+      |> Request.from_spec!()
+      |> Client.request()
 
     with {:ok, 200, _headers, _body} <- response do
       {:ok, path}
@@ -56,8 +56,8 @@ defmodule FileStore do
         method: :delete,
         path: path
       )
-      |> HTTPRequest.from_spec!()
-      |> HTTPClient.request()
+      |> Request.from_spec!()
+      |> Client.request()
 
     with {:ok, 204, _headers, _body} <- response do
       {:ok, path}
@@ -76,8 +76,8 @@ defmodule FileStore do
         "x-oss-expires" => 300
       }
     )
-    |> HTTPRequest.from_spec!()
-    |> HTTPRequest.url()
+    |> Request.from_spec!()
+    |> Request.url()
   end
 
   @acl "private"

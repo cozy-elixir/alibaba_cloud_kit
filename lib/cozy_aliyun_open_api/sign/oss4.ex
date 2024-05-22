@@ -22,7 +22,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
 
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.EasyTime
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
   alias CozyAliyunOpenAPI.Specs.OSS.Object.PostPolicy
   alias CozyAliyunOpenAPI.Sign
 
@@ -34,7 +34,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
   @behaviour Sign
 
   @impl true
-  def sign(%HTTPRequest{} = request,
+  def sign(%Request{} = request,
         at: %DateTime{} = at,
         type: type,
         config: %Config{} = config,
@@ -56,8 +56,8 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
 
     request
     |> sanitize_headers!()
-    |> HTTPRequest.put_header("host", request.host)
-    |> HTTPRequest.put_header("date", datetime_in_rfc1123)
+    |> Request.put_header("host", request.host)
+    |> Request.put_header("date", datetime_in_rfc1123)
     |> put_signature(ctx)
   end
 
@@ -129,11 +129,11 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     %{datetime: datetime} = ctx
 
     request
-    |> HTTPRequest.put_new_header("content-md5", &build_content_md5(&1))
-    |> HTTPRequest.put_new_header("content-type", &detect_content_type(&1))
-    |> HTTPRequest.put_header("x-oss-date", datetime)
-    |> HTTPRequest.put_header("x-oss-content-sha256", build_hashed_payload(request))
-    |> HTTPRequest.put_header("authorization", fn request ->
+    |> Request.put_new_header("content-md5", &build_content_md5(&1))
+    |> Request.put_new_header("content-type", &detect_content_type(&1))
+    |> Request.put_header("x-oss-date", datetime)
+    |> Request.put_header("x-oss-content-sha256", build_hashed_payload(request))
+    |> Request.put_header("authorization", fn request ->
       additional_headers = build_additional_headers(request)
 
       content =
@@ -153,12 +153,12 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     %{datetime: datetime} = ctx
 
     request
-    |> HTTPRequest.put_query("x-oss-signature-version", @signature_version)
-    |> HTTPRequest.put_query("x-oss-credential", build_credential(ctx))
-    |> HTTPRequest.put_query("x-oss-date", datetime)
-    |> HTTPRequest.put_new_query("x-oss-expires", fn _request -> 3600 end)
-    |> HTTPRequest.put_query("x-oss-additional-headers", &build_additional_headers(&1))
-    |> HTTPRequest.put_query("x-oss-signature", &build_signature(&1, ctx))
+    |> Request.put_query("x-oss-signature-version", @signature_version)
+    |> Request.put_query("x-oss-credential", build_credential(ctx))
+    |> Request.put_query("x-oss-date", datetime)
+    |> Request.put_new_query("x-oss-expires", fn _request -> 3600 end)
+    |> Request.put_query("x-oss-additional-headers", &build_additional_headers(&1))
+    |> Request.put_query("x-oss-signature", &build_signature(&1, ctx))
   end
 
   defp build_content_md5(request) do
@@ -200,7 +200,7 @@ defmodule CozyAliyunOpenAPI.Sign.OSS4 do
     |> base16()
   end
 
-  defp build_string_to_sign(%HTTPRequest{} = request, ctx) do
+  defp build_string_to_sign(%Request{} = request, ctx) do
     %{date: date, region: region, datetime: datetime} = ctx
 
     scope = Enum.join([date, region, @service_name, @request_version], "/")

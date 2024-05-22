@@ -19,7 +19,7 @@ defmodule CozyAliyunOpenAPI.Sign.ACS3 do
 
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.EasyTime
-  alias CozyAliyunOpenAPI.HTTPRequest
+  alias CozyAliyunOpenAPI.HTTP.Request
   alias CozyAliyunOpenAPI.Sign
 
   @signature_version "ACS3-HMAC-SHA256"
@@ -27,16 +27,16 @@ defmodule CozyAliyunOpenAPI.Sign.ACS3 do
   @behaviour Sign
 
   @impl true
-  def sign(%HTTPRequest{} = request, at: %DateTime{} = at, config: %Config{} = config) do
+  def sign(%Request{} = request, at: %DateTime{} = at, config: %Config{} = config) do
     datetime = EasyTime.to_extended_iso8601(at)
 
     request
     |> sanitize_headers!()
-    |> HTTPRequest.put_header("host", request.host)
-    |> HTTPRequest.put_header("x-acs-date", datetime)
-    |> HTTPRequest.put_header("x-acs-content-sha256", build_hashed_payload(request))
-    |> HTTPRequest.put_new_header("x-acs-signature-nonce", fn _request -> random_string() end)
-    |> HTTPRequest.put_header("authorization", fn request ->
+    |> Request.put_header("host", request.host)
+    |> Request.put_header("x-acs-date", datetime)
+    |> Request.put_header("x-acs-content-sha256", build_hashed_payload(request))
+    |> Request.put_new_header("x-acs-signature-nonce", fn _request -> random_string() end)
+    |> Request.put_header("authorization", fn request ->
       build_authorization(request, config)
     end)
   end

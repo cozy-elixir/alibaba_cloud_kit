@@ -3,8 +3,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
 
   alias CozyAliyunOpenAPI.Config
   alias CozyAliyunOpenAPI.Specs.OSS
-  alias CozyAliyunOpenAPI.HTTPRequest
-  alias CozyAliyunOpenAPI.HTTPClient
+  alias CozyAliyunOpenAPI.HTTP.Request
+  alias CozyAliyunOpenAPI.HTTP.Client
 
   @example_image_binary "../../files/lenna.png"
                         |> Path.expand(__DIR__)
@@ -35,8 +35,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                  method: :get,
                  path: "/"
                )
-               |> HTTPRequest.from_spec!()
-               |> HTTPClient.request()
+               |> Request.from_spec!()
+               |> Client.request()
     end
 
     test "works for Region operations - take DescribeRegions as example", %{
@@ -51,8 +51,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                  path: "/",
                  query: %{"regions" => nil}
                )
-               |> HTTPRequest.from_spec!()
-               |> HTTPClient.request()
+               |> Request.from_spec!()
+               |> Client.request()
     end
 
     test "works for Bucket operations - take ListObjectsV2 as example", %{
@@ -69,8 +69,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                  path: "/",
                  query: %{"list-type" => 2}
                )
-               |> HTTPRequest.from_spec!()
-               |> HTTPClient.request()
+               |> Request.from_spec!()
+               |> Client.request()
     end
 
     test "works for Object operations - take PutObject as example", %{
@@ -87,8 +87,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                  path: "/oss/put_object.png",
                  body: @example_image_binary
                )
-               |> HTTPRequest.from_spec!()
-               |> HTTPClient.request()
+               |> Request.from_spec!()
+               |> Client.request()
     end
 
     test "works for LiveChannel operations - take ListLiveChannel as example", %{
@@ -105,8 +105,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
                  path: "/",
                  query: %{"live" => nil}
                )
-               |> HTTPRequest.from_spec!()
-               |> HTTPClient.request()
+               |> Request.from_spec!()
+               |> Client.request()
     end
   end
 
@@ -138,8 +138,8 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
           method: :get,
           path: "/oss/get_object.png"
         )
-        |> HTTPRequest.from_spec!()
-        |> HTTPRequest.url()
+        |> Request.from_spec!()
+        |> Request.url()
 
       assert {:ok,
               %Finch.Response{

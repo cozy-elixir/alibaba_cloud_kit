@@ -6,7 +6,7 @@ defmodule CozyAliyunOpenAPI.Application do
   require Logger
 
   def start(_type, _args) do
-    CozyAliyunOpenAPI.HTTPClient.init()
+    CozyAliyunOpenAPI.HTTP.Client.init()
 
     children = []
 
