@@ -17,7 +17,6 @@ defmodule CozyAliyunOpenAPI do
 
       {:cozy_aliyun_open_api, "~> 0.4"},
       {:finch, "~> 0.18"},
-      {:sax_map, "~> 1.0"},
 
   Start a Finch child in your supervision tree:
 
