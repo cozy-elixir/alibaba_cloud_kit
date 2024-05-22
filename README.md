@@ -11,7 +11,15 @@ This package is an SDK builder. It provides utilities to reduce the cost of crea
 - sending requests
 - ...
 
-It doesn't provide one-to-one mapping against all available APIs. See the reason in [FAQ](#faq).
+And, this package was designed according to certain principles:
+
+- It provides only low-level APIs.
+- It doesn't touch the response body.
+- It doesn't provide one-to-one mapping against all available APIs. See the reason in [FAQ](#faq).
+
+## Notes
+
+This package is still in its early stages, so it may still undergo significant changes, potentially leading to breaking changes.
 
 ## Installation
 
