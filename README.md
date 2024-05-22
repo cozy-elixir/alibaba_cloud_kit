@@ -9,7 +9,6 @@ This package is an SDK builder. It provides utilities to reduce the cost of crea
 - building requests
 - signing requests
 - sending requests
-- converting the XML content or JSON content in the response to a map with snake-cased keys
 - ...
 
 It doesn't provide one-to-one mapping against all available APIs. See the reason in [FAQ](#faq).
