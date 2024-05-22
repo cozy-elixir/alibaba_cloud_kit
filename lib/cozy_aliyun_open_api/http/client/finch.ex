@@ -23,6 +23,7 @@ defmodule CozyAliyunOpenAPI.HTTP.Client.Finch do
 
   require Logger
   alias CozyAliyunOpenAPI.HTTP.Request
+  alias CozyAliyunOpenAPI.HTTP.Response
 
   @behaviour CozyAliyunOpenAPI.HTTP.Client
 
@@ -61,7 +62,8 @@ defmodule CozyAliyunOpenAPI.HTTP.Client.Finch do
 
     case Finch.request(request, finch_name()) do
       {:ok, response} ->
-        {:ok, response.status, response.headers, response.body}
+        {:ok,
+         struct(Response, status: response.status, headers: response.headers, body: response.body)}
 
       {:error, reason} ->
         {:error, reason}

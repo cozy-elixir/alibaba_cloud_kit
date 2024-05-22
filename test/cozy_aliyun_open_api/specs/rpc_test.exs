@@ -18,7 +18,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPCTest do
 
   describe "Turning an RPC spec as an HTTP request" do
     test "works for GET method", %{config: config} do
-      assert {:ok, 200, _header, _body} =
+      assert {:ok, %{status: 200}} =
                RPC.new!(config,
                  endpoint: "https://ecs-cn-hangzhou.aliyuncs.com/",
                  method: :get,
@@ -31,7 +31,7 @@ defmodule CozyAliyunOpenAPI.Specs.RPCTest do
     end
 
     test "works for POST method", %{config: config} do
-      assert {:ok, 200, _header, _body} =
+      assert {:ok, %{status: 200}} =
                RPC.new!(config,
                  endpoint: "https://ecs-cn-hangzhou.aliyuncs.com/",
                  method: :post,

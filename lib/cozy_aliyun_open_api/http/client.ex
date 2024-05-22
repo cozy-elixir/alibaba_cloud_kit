@@ -15,6 +15,7 @@ defmodule CozyAliyunOpenAPI.HTTP.Client do
   """
 
   alias CozyAliyunOpenAPI.HTTP.Request
+  alias CozyAliyunOpenAPI.HTTP.Response
 
   @type status :: pos_integer()
   @type headers :: [{binary(), binary()}]
@@ -23,7 +24,7 @@ defmodule CozyAliyunOpenAPI.HTTP.Client do
   @typedoc """
   The response of a request.
   """
-  @type response :: {:ok, status, headers, body} | {:error, term()}
+  @type response :: {:ok, Response.t()} | {:error, term()}
 
   @doc """
   Callback to initialize the given API client.

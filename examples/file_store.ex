@@ -23,8 +23,11 @@ defmodule FileStore do
       |> Request.from_spec!()
       |> Client.request()
 
-    with {:ok, 200, _headers, _body} <- response do
+    with {:ok, %{status: 200}} <- response do
       {:ok, path}
+    else
+      _ ->
+        :error
     end
   end
 
@@ -41,8 +44,11 @@ defmodule FileStore do
       |> Request.from_spec!()
       |> Client.request()
 
-    with {:ok, 200, _headers, _body} <- response do
+    with {:ok, %{status: 200}} <- response do
       {:ok, path}
+    else
+      _ ->
+        :error
     end
   end
 
@@ -59,8 +65,11 @@ defmodule FileStore do
       |> Request.from_spec!()
       |> Client.request()
 
-    with {:ok, 204, _headers, _body} <- response do
+    with {:ok, %{status: 204}} <- response do
       {:ok, path}
+    else
+      _ ->
+        :error
     end
   end
 

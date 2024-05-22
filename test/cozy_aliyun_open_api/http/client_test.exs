@@ -4,7 +4,7 @@ defmodule CozyAliyunOpenAPI.HTTP.ClientTest do
   alias CozyAliyunOpenAPI.HTTP.Client
 
   test "creates and requests an HTTP request" do
-    assert {:ok, 200, _, _} =
+    assert {:ok, %{status: 200}} =
              %{
                scheme: "https",
                host: "httpbin.org",

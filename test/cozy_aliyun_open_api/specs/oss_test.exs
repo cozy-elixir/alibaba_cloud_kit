@@ -28,7 +28,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       config: config,
       region: region
     } do
-      assert {:ok, 200, _header, _body} =
+      assert {:ok, %{status: 200}} =
                OSS.new!(config,
                  region: region,
                  endpoint: "https://#{region}.aliyuncs.com/",
@@ -43,7 +43,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       config: config,
       region: region
     } do
-      assert {:ok, 200, _header, _body} =
+      assert {:ok, %{status: 200}} =
                OSS.new!(config,
                  region: region,
                  endpoint: "https://#{region}.aliyuncs.com/",
@@ -60,7 +60,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       region: region,
       bucket: bucket
     } do
-      assert {:ok, 200, _header, _body} =
+      assert {:ok, %{status: 200}} =
                OSS.new!(config,
                  region: region,
                  bucket: bucket,
@@ -78,7 +78,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       region: region,
       bucket: bucket
     } do
-      assert {:ok, 200, _header, _body} =
+      assert {:ok, %{status: 200}} =
                OSS.new!(config,
                  region: region,
                  bucket: bucket,
@@ -96,7 +96,7 @@ defmodule CozyAliyunOpenAPI.Specs.OSSTest do
       region: region,
       bucket: bucket
     } do
-      assert {:ok, 200, _header, _body} =
+      assert {:ok, %{status: 200}} =
                OSS.new!(config,
                  region: region,
                  bucket: bucket,

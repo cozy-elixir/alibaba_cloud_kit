@@ -21,7 +21,7 @@ defmodule FileStoreTest do
     assert {:ok, _path} = FileStore.put_file(remote_path, @example_image_binary)
     assert {:ok, _data} = FileStore.get_file(remote_path)
     assert {:ok, _path} = FileStore.delete_file(remote_path)
-    assert {:ok, 404, _, _} = FileStore.get_file(remote_path)
+    assert :error = FileStore.get_file(remote_path)
   end
 
   test "generates a signed URL which can be accessed in Web browser" do
