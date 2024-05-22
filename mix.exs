@@ -1,7 +1,7 @@
 defmodule CozyAliyunOpenAPI.MixProject do
   use Mix.Project
 
-  @version "0.5.0"
+  @version "0.6.0"
   @description "An SDK builder for Aliyun / Alibaba Cloud OpenAPI."
   @source_url "https://github.com/cozy-elixir/cozy_aliyun_open_api"
 
