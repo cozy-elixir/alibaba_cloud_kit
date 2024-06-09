@@ -15,7 +15,7 @@ defmodule CozyAliyunOpenAPI do
 
   Add necessary packages:
 
-      {:cozy_aliyun_open_api, "~> 0.4"},
+      {:cozy_aliyun_open_api, "~> 0.6"},
       {:finch, "~> 0.18"},
 
   Start a Finch child in your supervision tree:
