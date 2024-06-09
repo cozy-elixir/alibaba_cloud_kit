@@ -1,13 +1,13 @@
-defmodule CozyAliyunOpenAPI.MixProject do
+defmodule AliyunOpenAPI.MixProject do
   use Mix.Project
 
   @version "0.6.0"
   @description "An SDK builder for Aliyun / Alibaba Cloud OpenAPI."
-  @source_url "https://github.com/cozy-elixir/cozy_aliyun_open_api"
+  @source_url "https://github.com/cozy-elixir/aliyun_open_api"
 
   def project do
     [
-      app: :cozy_aliyun_open_api,
+      app: :aliyun_open_api,
       version: @version,
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -26,8 +26,8 @@ defmodule CozyAliyunOpenAPI.MixProject do
   def application do
     [
       extra_applications: [:logger, :crypto],
-      mod: {CozyAliyunOpenAPI.Application, []},
-      env: [json_library: Jason, http_client: CozyAliyunOpenAPI.HTTP.Client.Finch]
+      mod: {AliyunOpenAPI.Application, []},
+      env: [json_library: Jason, http_client: AliyunOpenAPI.HTTP.Client.Finch]
     ]
   end
 

@@ -1,3 +1,3 @@
-Finch.start_link(name: CozyAliyunOpenAPI.Finch)
+Finch.start_link(name: AliyunOpenAPI.Finch)
 
 ExUnit.start()

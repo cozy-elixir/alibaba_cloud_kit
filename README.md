@@ -1,6 +1,6 @@
-# CozyAliyunOpenAPI
+# AliyunOpenAPI
 
-[![Hex.pm](https://img.shields.io/hexpm/v/cozy_aliyun_open_api.svg)](https://hex.pm/packages/cozy_aliyun_open_api)
+[![Hex.pm](https://img.shields.io/hexpm/v/aliyun_open_api.svg)](https://hex.pm/packages/aliyun_open_api)
 
 > An SDK builder for Aliyun / Alibaba Cloud OpenAPI.
 
@@ -23,19 +23,19 @@ This package is still in its early stages, so it may still undergo significant c
 
 ## Installation
 
-Add `:cozy_aliyun_open_api` to the list of dependencies in `mix.exs`:
+Add `:aliyun_open_api` to the list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:cozy_aliyun_open_api, "~> <version>"}
+    {:aliyun_open_api, "~> <version>"}
   ]
 end
 ```
 
 ## Usage
 
-For more information, see the [documentation](https://hexdocs.pm/cozy_aliyun_open_api/CozyAliyunOpenAPI.html).
+For more information, see the [documentation](https://hexdocs.pm/aliyun_open_api/AliyunOpenAPI.html).
 
 ## FAQ
 

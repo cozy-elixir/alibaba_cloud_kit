@@ -3,11 +3,11 @@ defmodule FileStore do
   An example module provides basic API to operate files.
   """
 
-  alias CozyAliyunOpenAPI.Config
-  alias CozyAliyunOpenAPI.Specs.OSS
-  alias CozyAliyunOpenAPI.Specs.OSS.Object
-  alias CozyAliyunOpenAPI.HTTP.Request
-  alias CozyAliyunOpenAPI.HTTP.Client
+  alias AliyunOpenAPI.Config
+  alias AliyunOpenAPI.Specs.OSS
+  alias AliyunOpenAPI.Specs.OSS.Object
+  alias AliyunOpenAPI.HTTP.Request
+  alias AliyunOpenAPI.HTTP.Client
 
   def put_file(path, data) when is_binary(path) and is_binary(data) do
     response =
