@@ -107,10 +107,8 @@ defmodule FileStore do
       "x-oss-signature": x_oss_signature
     } = Object.presign_post_object(config(), region(), bucket(), conditions, @seconds_to_expire)
 
-    endpoint = "https://#{bucket()}.#{region()}.aliyuncs.com"
-
     %{
-      endpoint: endpoint,
+      endpoint: endpoint(),
       method: :post,
       fields: %{
         key: path,
