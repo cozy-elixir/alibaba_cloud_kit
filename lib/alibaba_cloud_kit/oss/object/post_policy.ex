@@ -1,4 +1,4 @@
-defmodule AliyunOpenAPI.Specs.OSS.Object.PostPolicy do
+defmodule AlibabaCloudKit.OSS.Object.PostPolicy do
   @moduledoc false
 
   @enforce_keys [:expiration, :conditions]

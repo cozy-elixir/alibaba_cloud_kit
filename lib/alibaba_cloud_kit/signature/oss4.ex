@@ -1,15 +1,19 @@
-defmodule AliyunOpenAPI.Sign.OSS4 do
+defmodule AlibabaCloudKit.Signature.OSS4 do
   @moduledoc """
   A implementation for OSS V4 signature.
 
   Read more at:
 
     * [Object Storage Service > Developer Reference > Use the RESTful API to initiate requests](https://www.alibabacloud.com/help/en/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
-    * [Object Storage Service > Developer Reference > Use the RESTful API to initiate requests (zh-Hans)](https://www.alibabacloud.com/help/zh/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
+    * [对象存储 > 开发参考 > 开发指南 > 使用 REST API 发起请求](https://help.aliyun.com/zh/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
 
   """
 
-  import AliyunOpenAPI.Utils,
+  alias HTTPSpec.Request
+  alias AlibabaCloudKit.EasyTime
+  alias AlibabaCloudKit.OSS.Object.PostPolicy
+
+  import AlibabaCloudKit.Utils,
     only: [
       encode_json!: 1,
       encode_rfc3986: 1,
@@ -20,59 +24,54 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
       base64: 1
     ]
 
-  alias AliyunOpenAPI.Config
-  alias AliyunOpenAPI.EasyTime
-  alias AliyunOpenAPI.HTTP.Request
-  alias AliyunOpenAPI.Specs.OSS.Object.PostPolicy
-  alias AliyunOpenAPI.Sign
-
   @signature_version "OSS4-HMAC-SHA256"
   @access_key_version "aliyun_v4"
   @request_version "aliyun_v4_request"
   @service_name "oss"
 
-  @behaviour Sign
-
-  @impl true
-  def sign(%Request{} = request,
-        at: %DateTime{} = at,
-        type: type,
-        config: %Config{} = config,
+  def sign(%Request{} = request, %{
+        access_key_id: access_key_id,
+        access_key_secret: access_key_secret,
         region: region,
-        bucket: bucket
-      ) do
+        bucket: bucket,
+        sign_type: sign_type,
+        at: at
+      }) do
+    at = at || EasyTime.utc_now(:second)
     datetime_in_rfc1123 = EasyTime.to_rfc1123(at)
     datetime_in_iso8601 = EasyTime.to_basic_iso8601(at)
     date_in_iso8601 = DateTime.to_date(at) |> EasyTime.to_basic_iso8601()
 
     ctx = %{
-      type: type,
-      config: config,
+      access_key_id: access_key_id,
+      access_key_secret: access_key_secret,
       region: sanitize_region(region),
       bucket: bucket,
+      sign_type: sign_type,
       datetime: datetime_in_iso8601,
       date: date_in_iso8601
     }
 
     request
-    |> sanitize_headers!()
     |> Request.put_header("host", request.host)
     |> Request.put_header("date", datetime_in_rfc1123)
     |> put_signature(ctx)
   end
 
-  @impl true
-  def sign(%PostPolicy{} = post_policy,
-        at: %DateTime{} = at,
-        config: %Config{} = config,
+  def sign(%PostPolicy{} = post_policy, %{
+        access_key_id: access_key_id,
+        access_key_secret: access_key_secret,
         region: region,
-        bucket: bucket
-      ) do
+        bucket: bucket,
+        at: at
+      }) do
+    at = at || EasyTime.utc_now(:second)
     datetime_in_iso8601 = EasyTime.to_basic_iso8601(at)
     date_in_iso8601 = DateTime.to_date(at) |> EasyTime.to_basic_iso8601()
 
     ctx = %{
-      config: config,
+      access_key_id: access_key_id,
+      access_key_secret: access_key_secret,
       region: sanitize_region(region),
       bucket: bucket,
       datetime: datetime_in_iso8601,
@@ -86,17 +85,20 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
   end
 
   @doc false
-  def prepare_sign_info_for_post_policy(
-        at: %DateTime{} = at,
-        config: %Config{} = config,
+  def prepare_sign_info_for_post_policy(%{
+        access_key_id: access_key_id,
+        access_key_secret: access_key_secret,
         region: region,
-        bucket: bucket
-      ) do
+        bucket: bucket,
+        at: at
+      }) do
+    at = at || EasyTime.utc_now(:second)
     datetime_in_iso8601 = EasyTime.to_basic_iso8601(at)
     date_in_iso8601 = DateTime.to_date(at) |> EasyTime.to_basic_iso8601()
 
     ctx = %{
-      config: config,
+      access_key_id: access_key_id,
+      access_key_secret: access_key_secret,
       region: sanitize_region(region),
       bucket: bucket,
       datetime: datetime_in_iso8601,
@@ -106,7 +108,8 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
     %{
       signature_version: @signature_version,
       credential: build_credential(ctx),
-      datetime: datetime_in_iso8601
+      datetime: datetime_in_iso8601,
+      at: at
     }
   end
 
@@ -114,26 +117,15 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
     String.trim_leading(region, "oss-")
   end
 
-  defp sanitize_headers!(request) do
-    Map.update!(request, :headers, fn headers ->
-      Enum.into(headers, %{}, fn {k, v} ->
-        {
-          k |> Kernel.to_string() |> String.trim() |> String.downcase(),
-          v |> Kernel.to_string() |> String.trim()
-        }
-      end)
-    end)
-  end
-
-  defp put_signature(request, %{type: :header} = ctx) do
+  defp put_signature(request, %{sign_type: :header} = ctx) do
     %{datetime: datetime} = ctx
 
     request
-    |> Request.put_new_header("content-md5", &build_content_md5(&1))
-    |> Request.put_new_header("content-type", &detect_content_type(&1))
+    |> Request.put_new_lazy_header("content-md5", &build_content_md5(&1))
+    |> Request.put_new_lazy_header("content-type", &detect_content_type(&1))
     |> Request.put_header("x-oss-date", datetime)
     |> Request.put_header("x-oss-content-sha256", build_hashed_payload(request))
-    |> Request.put_header("authorization", fn request ->
+    |> Request.put_new_lazy_header("authorization", fn request ->
       additional_headers = build_additional_headers(request)
 
       content =
@@ -149,16 +141,27 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
     end)
   end
 
-  defp put_signature(request, %{type: :url} = ctx) do
+  defp put_signature(request, %{sign_type: :query} = ctx) do
     %{datetime: datetime} = ctx
 
-    request
-    |> Request.put_query("x-oss-signature-version", @signature_version)
-    |> Request.put_query("x-oss-credential", build_credential(ctx))
-    |> Request.put_query("x-oss-date", datetime)
-    |> Request.put_new_query("x-oss-expires", fn _request -> 3600 end)
-    |> Request.put_query("x-oss-additional-headers", &build_additional_headers(&1))
-    |> Request.put_query("x-oss-signature", &build_signature(&1, ctx))
+    query_params =
+      Request.Query.decode(request.query)
+      |> Request.Query.put("x-oss-signature-version", @signature_version)
+      |> Request.Query.put("x-oss-credential", build_credential(ctx))
+      |> Request.Query.put("x-oss-date", datetime)
+      |> Request.Query.put_new_lazy("x-oss-expires", fn -> 3600 end)
+      |> Request.Query.put_new_lazy("x-oss-additional-headers", fn ->
+        build_additional_headers(request)
+      end)
+
+    request = Request.put_query(request, Request.Query.encode(query_params))
+
+    query =
+      query_params
+      |> Request.Query.put_new_lazy("x-oss-signature", fn -> build_signature(request, ctx) end)
+      |> Request.Query.encode()
+
+    Request.put_query(request, query)
   end
 
   defp build_content_md5(request) do
@@ -176,9 +179,9 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
 
   defp build_credential(ctx) do
     %{
-      config: %{access_key_id: access_key_id},
-      region: region,
-      date: date
+      access_key_id: access_key_id,
+      date: date,
+      region: region
     } = ctx
 
     Enum.join([access_key_id, date, region, @service_name, @request_version], "/")
@@ -186,7 +189,7 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
 
   defp build_signature(request_or_post_policy, ctx) do
     %{
-      config: %{access_key_secret: access_key_secret},
+      access_key_secret: access_key_secret,
       date: date,
       region: region
     } = ctx
@@ -235,9 +238,7 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
   end
 
   defp build_method(request) do
-    request.method
-    |> Atom.to_string()
-    |> String.upcase()
+    Request.build_method(request)
   end
 
   defp build_canonical_path(request, ctx) do
@@ -253,6 +254,8 @@ defmodule AliyunOpenAPI.Sign.OSS4 do
 
   defp build_canonical_querystring(request) do
     request.query
+    |> Request.Query.decode()
+    |> Map.fetch!(:internal)
     |> Enum.sort()
     |> Enum.map_join("&", fn
       {k, nil} -> encode_rfc3986(k)

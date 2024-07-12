@@ -16,22 +16,24 @@ defmodule FileStoreTest do
     :ok
   end
 
+  @tag external: true
   test "manage files" do
-    remote_path = "examples/file_store/temporary/lenna.png"
-    assert {:ok, _path} = FileStore.put_file(remote_path, @example_image_binary)
-    assert {:ok, _data} = FileStore.get_file(remote_path)
-    assert {:ok, _path} = FileStore.delete_file(remote_path)
-    assert :error = FileStore.get_file(remote_path)
+    key = "examples/file_store/temporary/lenna.png"
+    assert {:ok, _key} = FileStore.put_file(key, @example_image_binary)
+    assert {:ok, _data} = FileStore.get_file(key)
+    assert {:ok, _key} = FileStore.delete_file(key)
+    assert :error = FileStore.get_file(key)
   end
 
+  @tag external: true
   test "generates a signed URL which can be accessed in Web browser" do
-    remote_path = "examples/file_store/persistent/lenna.png"
-    {:ok, path} = FileStore.put_file(remote_path, @example_image_binary)
-    url = FileStore.get_access_url(path)
-
+    key = "examples/file_store/persistent/lenna.png"
+    {:ok, key} = FileStore.put_file(key, @example_image_binary)
+    url = FileStore.get_access_url(key)
     assert {:ok, %{status: 200}} = Tesla.get(url)
   end
 
+  @tag external: true
   test "presigns a file and uploading a file with related information" do
     alias Tesla.Multipart
 
@@ -43,7 +45,7 @@ defmodule FileStoreTest do
       fields: fields
     } = FileStore.presign_file(remote_path)
 
-    mp =
+    multipart =
       Multipart.new()
       |> then(
         &Enum.reduce(fields, &1, fn {k, v}, multipart ->
@@ -52,6 +54,11 @@ defmodule FileStoreTest do
       )
       |> Multipart.add_file_content(@example_image_binary, Path.basename(fields.key))
 
-    assert {:ok, %{status: 204}} = Tesla.request(method: method, url: endpoint, body: mp)
+    assert {:ok, %{status: 204}} =
+             Tesla.request(
+               method: method,
+               url: endpoint,
+               body: multipart
+             )
   end
 end

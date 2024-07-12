@@ -1,15 +1,15 @@
-defmodule AliyunOpenAPI.MixProject do
+defmodule AlibabaCloudKit.MixProject do
   use Mix.Project
 
   @version "0.6.0"
-  @description "An SDK builder for Aliyun / Alibaba Cloud OpenAPI."
-  @source_url "https://github.com/cozy-elixir/aliyun_open_api"
+  @description "A kit for Alibaba Cloud or Aliyun."
+  @source_url "https://github.com/cozy-elixir/alibaba_cloud_kit"
 
   def project do
     [
-      app: :aliyun_open_api,
+      app: :alibaba_cloud_kit,
       version: @version,
-      elixir: "~> 1.13",
+      elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -25,9 +25,7 @@ defmodule AliyunOpenAPI.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :crypto],
-      mod: {AliyunOpenAPI.Application, []},
-      env: [json_library: Jason, http_client: AliyunOpenAPI.HTTP.Client.Finch]
+      extra_applications: [:logger, :crypto]
     ]
   end
 
@@ -39,10 +37,11 @@ defmodule AliyunOpenAPI.MixProject do
   defp deps do
     [
       {:nimble_options, "~> 1.0"},
-      {:jason, "~> 1.0"},
-      {:finch, "~> 0.13", only: [:dev, :test]},
-      {:tesla, "~> 1.4", only: [:test]},
-      {:ex_check, "~> 0.15.0", only: [:dev], runtime: false},
+      {:http_spec, "~> 2.1"},
+      {:jxon, "~> 0.1"},
+      {:jason, "~> 1.0", only: [:dev, :test]},
+      {:tesla, "~> 1.11", only: [:test]},
+      {:ex_check, ">= 0.0.0", only: [:dev], runtime: false},
       {:credo, ">= 0.0.0", only: [:dev], runtime: false},
       {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
       {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false},

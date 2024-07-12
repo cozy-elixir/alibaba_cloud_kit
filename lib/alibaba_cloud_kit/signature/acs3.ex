@@ -1,15 +1,15 @@
-defmodule AliyunOpenAPI.Sign.ACS3 do
+defmodule AlibabaCloudKit.Signature.ACS3 do
   @moduledoc """
   A implementation for ACS V3 signature.
 
   Read more at:
 
     * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method V3](https://www.alibabacloud.com/help/en/sdk/product-overview/v3-request-structure-and-signature)
-    * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method V3 (zh-Hans)](https://www.alibabacloud.com/help/zh/sdk/product-overview/v3-request-structure-and-signature)
+    * [阿里云 SDK > 产品概述 > 请求结构和签名机制 > V3 版本请求体 & 签名机制](https://help.aliyun.com/zh/sdk/product-overview/request-structure-and-signature)
 
   """
 
-  import AliyunOpenAPI.Utils,
+  import AlibabaCloudKit.Utils,
     only: [
       random_string: 0,
       sha256: 1,
@@ -17,45 +17,38 @@ defmodule AliyunOpenAPI.Sign.ACS3 do
       base16: 1
     ]
 
-  alias AliyunOpenAPI.Config
-  alias AliyunOpenAPI.EasyTime
-  alias AliyunOpenAPI.HTTP.Request
-  alias AliyunOpenAPI.Sign
+  alias HTTPSpec.Request
+  alias AlibabaCloudKit.EasyTime
 
   @signature_version "ACS3-HMAC-SHA256"
 
-  @behaviour Sign
-
-  @impl true
-  def sign(%Request{} = request, at: %DateTime{} = at, config: %Config{} = config) do
+  def sign(%Request{} = request, %{
+        access_key_id: access_key_id,
+        access_key_secret: access_key_secret,
+        at: at
+      }) do
+    at = at || EasyTime.utc_now(:second)
     datetime = EasyTime.to_extended_iso8601(at)
 
+    ctx = %{
+      access_key_id: access_key_id,
+      access_key_secret: access_key_secret
+    }
+
     request
-    |> sanitize_headers!()
     |> Request.put_header("host", request.host)
     |> Request.put_header("x-acs-date", datetime)
     |> Request.put_header("x-acs-content-sha256", build_hashed_payload(request))
-    |> Request.put_new_header("x-acs-signature-nonce", fn _request -> random_string() end)
-    |> Request.put_header("authorization", fn request ->
-      build_authorization(request, config)
+    |> Request.put_new_lazy_header("x-acs-signature-nonce", fn -> random_string() end)
+    |> Request.put_new_lazy_header("authorization", fn request ->
+      build_authorization(request, ctx)
     end)
   end
 
-  defp sanitize_headers!(request) do
-    Map.update!(request, :headers, fn headers ->
-      Enum.into(headers, %{}, fn {k, v} ->
-        {
-          k |> Kernel.to_string() |> String.trim() |> String.downcase(),
-          v |> Kernel.to_string() |> String.trim()
-        }
-      end)
-    end)
-  end
-
-  defp build_authorization(request, config) do
-    credential = config.access_key_id
+  defp build_authorization(request, ctx) do
+    credential = ctx.access_key_id
     signed_headers = build_signed_headers(request)
-    signature = build_signature(request, config.access_key_secret)
+    signature = build_signature(request, ctx.access_key_secret)
 
     content =
       [
@@ -95,9 +88,7 @@ defmodule AliyunOpenAPI.Sign.ACS3 do
   end
 
   defp build_method(request) do
-    request.method
-    |> Atom.to_string()
-    |> String.upcase()
+    Request.build_method(request)
   end
 
   defp build_canonical_path(request) do
@@ -107,6 +98,8 @@ defmodule AliyunOpenAPI.Sign.ACS3 do
 
   defp build_canonical_querystring(request) do
     request.query
+    |> Request.Query.decode()
+    |> Map.fetch!(:internal)
     |> Enum.sort()
     |> URI.encode_query(:rfc3986)
   end

@@ -1,4 +1,4 @@
-defmodule AliyunOpenAPI.EasyTime do
+defmodule AlibabaCloudKit.EasyTime do
   @moduledoc false
 
   @type time_unit :: :native | :microsecond | :millisecond | :second

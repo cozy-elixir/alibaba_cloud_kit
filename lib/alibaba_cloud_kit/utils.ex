@@ -1,4 +1,4 @@
-defmodule AliyunOpenAPI.Utils do
+defmodule AlibabaCloudKit.Utils do
   @moduledoc false
 
   @doc false
@@ -15,16 +15,14 @@ defmodule AliyunOpenAPI.Utils do
 
   @doc false
   def encode_json!(term) do
-    json_library().encode!(term)
+    {:ok, binary} = JXON.encode(term)
+    binary
   end
 
   @doc false
-  def decode_json!(string) do
-    json_library().decode!(string)
-  end
-
-  defp json_library do
-    Application.fetch_env!(:aliyun_open_api, :json_library)
+  def decode_json!(binary) do
+    {:ok, term} = JXON.decode(binary)
+    term
   end
 
   @doc false

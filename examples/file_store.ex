@@ -3,101 +3,93 @@ defmodule FileStore do
   An example module provides basic API to operate files.
   """
 
-  alias AliyunOpenAPI.Config
-  alias AliyunOpenAPI.Specs.OSS
-  alias AliyunOpenAPI.Specs.OSS.Object
-  alias AliyunOpenAPI.HTTP.Request
-  alias AliyunOpenAPI.HTTP.Client
+  alias HTTPSpec.Request
+  alias AlibabaCloudKit.OSS
 
-  def put_file(path, data) when is_binary(path) and is_binary(data) do
-    response =
-      OSS.new!(config(),
-        sign_type: :header,
-        region: region(),
-        bucket: bucket(),
-        endpoint: endpoint(),
+  def put_file(key, data) when is_binary(key) and is_binary(key) do
+    request =
+      build_request(
         method: :put,
-        path: path,
+        path: Path.join("/", key),
         body: data
       )
-      |> Request.from_spec!()
-      |> Client.request()
 
-    with {:ok, %{status: 200}} <- response do
-      {:ok, path}
-    else
-      _ ->
-        :error
+    opts = build_opts(sign_type: :header)
+
+    request
+    |> OSS.sign_request!(opts)
+    |> send_request()
+    |> case do
+      {:ok, %{status: 200}} -> {:ok, key}
+      _ -> :error
     end
   end
 
-  def get_file(path) when is_binary(path) do
-    response =
-      OSS.new!(config(),
-        sign_type: :header,
-        region: region(),
-        bucket: bucket(),
-        endpoint: endpoint(),
+  def get_file(key) when is_binary(key) do
+    request =
+      build_request(
         method: :get,
-        path: path
+        path: Path.join("/", key)
       )
-      |> Request.from_spec!()
-      |> Client.request()
 
-    with {:ok, %{status: 200}} <- response do
-      {:ok, path}
-    else
-      _ ->
-        :error
+    opts = build_opts(sign_type: :header)
+
+    request
+    |> OSS.sign_request!(opts)
+    |> send_request()
+    |> case do
+      {:ok, %{status: 200, body: data}} -> {:ok, data}
+      _ -> :error
     end
   end
 
-  def delete_file(path) when is_binary(path) do
-    response =
-      OSS.new!(config(),
-        sign_type: :header,
-        region: region(),
-        bucket: bucket(),
-        endpoint: endpoint(),
+  def delete_file(key) when is_binary(key) do
+    request =
+      build_request(
         method: :delete,
-        path: path
+        path: Path.join("/", key)
       )
-      |> Request.from_spec!()
-      |> Client.request()
 
-    with {:ok, %{status: 204}} <- response do
-      {:ok, path}
-    else
-      _ ->
-        :error
+    opts = build_opts(sign_type: :header)
+
+    request
+    |> OSS.sign_request!(opts)
+    |> send_request()
+    |> case do
+      {:ok, %{status: 204}} -> {:ok, key}
+      _ -> :error
     end
   end
 
-  def get_access_url(path) when is_binary(path) do
-    OSS.new!(config(),
-      sign_type: :url,
-      region: region(),
-      bucket: bucket(),
-      endpoint: endpoint(),
-      method: :get,
-      path: path,
-      query: %{
-        "x-oss-expires" => 300
-      }
-    )
-    |> Request.from_spec!()
-    |> Request.url()
+  def get_access_url(key) when is_binary(key) do
+    request =
+      build_request(
+        method: :get,
+        path: Path.join("/", key),
+        query: "x-oss-expires=300"
+      )
+
+    opts = build_opts(sign_type: :query)
+
+    request
+    |> OSS.sign_request!(opts)
+    |> Request.build_url()
   end
 
   @acl "private"
   @max_size_in_bytes 1024 * 1024 * 100
   @seconds_to_expire 1800
-  def presign_file(path) when is_binary(path) do
+
+  def presign_file(key) when is_binary(key) do
     conditions = [
-      ["eq", "$key", path],
+      ["eq", "$key", key],
       ["eq", "$x-oss-object-acl", @acl],
       ["content-length-range", 1, @max_size_in_bytes]
     ]
+
+    opts = build_opts()
+
+    endpoint = "https://#{opts[:bucket]}.#{opts[:region]}.aliyuncs.com"
 
     %{
       policy: policy,
@@ -105,13 +97,13 @@ defmodule FileStore do
       "x-oss-date": x_oss_date,
       "x-oss-signature-version": x_oss_signature_version,
       "x-oss-signature": x_oss_signature
-    } = Object.presign_post_object(config(), region(), bucket(), conditions, @seconds_to_expire)
+    } = OSS.Object.presign_post_object(conditions, @seconds_to_expire, opts)
 
     %{
-      endpoint: endpoint(),
+      endpoint: endpoint,
       method: :post,
       fields: %{
-        key: path,
+        key: key,
         "x-oss-object-acl": @acl,
         policy: policy,
         "x-oss-credential": x_oss_credential,
@@ -122,26 +114,40 @@ defmodule FileStore do
     }
   end
 
-  defp config do
-    :demo
-    |> Application.fetch_env!(__MODULE__)
-    |> Keyword.take([:access_key_id, :access_key_secret])
-    |> Config.new!()
+  defp build_request(overrides) when is_list(overrides) do
+    config =
+      :demo
+      |> Application.fetch_env!(__MODULE__)
+      |> Keyword.take([:region, :bucket])
+
+    default = [
+      scheme: :https,
+      host: "#{config[:bucket]}.#{config[:region]}.aliyuncs.com",
+      port: 443
+    ]
+
+    default
+    |> Keyword.merge(overrides)
+    |> Request.new!()
   end
 
-  defp region do
+  defp build_opts(overrides \\ []) when is_list(overrides) do
     :demo
     |> Application.fetch_env!(__MODULE__)
-    |> Keyword.fetch!(:region)
+    |> Keyword.take([:access_key_id, :access_key_secret, :region, :bucket])
+    |> Keyword.merge(overrides)
   end
 
-  defp bucket do
-    :demo
-    |> Application.fetch_env!(__MODULE__)
-    |> Keyword.fetch!(:bucket)
+  defp send_request(url) when is_binary(url) do
+    Tesla.get(url)
   end
 
-  defp endpoint do
-    "https://#{bucket()}.#{region()}.aliyuncs.com"
+  defp send_request(%HTTPSpec.Request{} = request) do
+    Tesla.request(
+      method: request.method,
+      url: HTTPSpec.Request.build_url(request),
+      headers: request.headers,
+      body: request.body
+    )
   end
 end
