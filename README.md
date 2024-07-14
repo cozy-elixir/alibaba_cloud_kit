@@ -1,5 +1,6 @@
 # AlibabaCloudKit
 
+[![CI](https://github.com/cozy-elixir/alibaba_cloud_kit/actions/workflows/ci.yml/badge.svg)](https://github.com/cozy-elixir/alibaba_cloud_kit/actions/workflows/ci.yml)
 [![Hex.pm](https://img.shields.io/hexpm/v/alibaba_cloud_kit.svg)](https://hex.pm/packages/alibaba_cloud_kit)
 
 A kit for Alibaba Cloud or Aliyun.
