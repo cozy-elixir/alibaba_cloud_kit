@@ -7,7 +7,7 @@ defmodule AlibabaCloudKit do
 
   ## API styles
 
-  For a variety of reasons, Aliyun OpenAPI involves several different API styles:
+  For a variety of reasons, Alibaba Cloud involves several different API styles:
 
   * RPC
   * ROA
@@ -56,8 +56,8 @@ defmodule AlibabaCloudKit do
 
   In official docs, the term *endpoint* refers to different things:
 
-  * sometimes, it refers to a host, such as `ecs-cn-hangzhou.aliyuncs.com`.
-  * sometimes, it refers to a URL, such as `https://ecs-cn-hangzhou.aliyuncs.com`.
+  * sometimes, it refers to a host, such as `ecs.us-west-1.aliyuncs.com`.
+  * sometimes, it refers to a URL, such as `https://ecs.use-west-1.aliyuncs.com`.
 
   This kind of inconsistency is annoying.
 
