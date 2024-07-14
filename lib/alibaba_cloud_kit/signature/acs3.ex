@@ -11,6 +11,8 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
 
   import AlibabaCloudKit.Utils,
     only: [
+      utc_now: 1,
+      to_extended_iso8601: 1,
       random_string: 0,
       sha256: 1,
       hmac_sha256: 2,
@@ -18,7 +20,6 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
     ]
 
   alias HTTPSpec.Request
-  alias AlibabaCloudKit.EasyTime
 
   @signature_version "ACS3-HMAC-SHA256"
 
@@ -27,8 +28,8 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
         access_key_secret: access_key_secret,
         at: at
       }) do
-    at = at || EasyTime.utc_now(:second)
-    datetime = EasyTime.to_extended_iso8601(at)
+    at = at || utc_now(:second)
+    datetime = to_extended_iso8601(at)
 
     ctx = %{
       access_key_id: access_key_id,

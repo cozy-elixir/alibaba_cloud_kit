@@ -18,13 +18,15 @@ defmodule AlibabaCloudKit.Signature.DirectMail do
 
   import AlibabaCloudKit.Utils,
     only: [
+      utc_now: 1,
+      to_extended_iso8601: 1,
       random_string: 0,
       hmac_sha1: 2,
-      base64: 1
+      base64: 1,
+      encode_rfc3986: 1
     ]
 
   alias HTTPSpec.Request
-  alias AlibabaCloudKit.EasyTime
 
   @sign_opts_definition NimbleOptions.new!(
                           access_key_id: [
@@ -57,14 +59,14 @@ defmodule AlibabaCloudKit.Signature.DirectMail do
       at: at
     } = opts
 
-    at = at || EasyTime.utc_now(:second)
+    at = at || utc_now(:second)
 
     default_params = %{
       "AccessKeyId" => access_key_id,
       "SignatureMethod" => "HMAC-SHA1",
       "SignatureVersion" => "1.0",
       "SignatureNonce" => random_string(),
-      "Timestamp" => EasyTime.to_extended_iso8601(at)
+      "Timestamp" => to_extended_iso8601(at)
     }
 
     request
@@ -120,7 +122,7 @@ defmodule AlibabaCloudKit.Signature.DirectMail do
       build_canonical_path(request),
       build_canonical_params(request)
     ]
-    |> Enum.map_join("&", &encode_rfc3986_value/1)
+    |> Enum.map_join("&", &encode_rfc3986/1)
   end
 
   defp build_canonical_method(request) do
@@ -143,9 +145,5 @@ defmodule AlibabaCloudKit.Signature.DirectMail do
     |> URI.decode_query(%{}, :www_form)
     |> Enum.sort()
     |> URI.encode_query(:rfc3986)
-  end
-
-  defp encode_rfc3986_value(string) when is_binary(string) do
-    URI.encode(string, &URI.char_unreserved?/1)
   end
 end

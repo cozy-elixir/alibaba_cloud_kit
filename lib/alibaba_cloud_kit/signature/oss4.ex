@@ -10,11 +10,13 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
   """
 
   alias HTTPSpec.Request
-  alias AlibabaCloudKit.EasyTime
   alias AlibabaCloudKit.OSS.Object.PostPolicy
 
   import AlibabaCloudKit.Utils,
     only: [
+      utc_now: 1,
+      to_rfc1123: 1,
+      to_basic_iso8601: 1,
       encode_json!: 1,
       encode_rfc3986: 1,
       md5: 1,
@@ -37,10 +39,10 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
         sign_type: sign_type,
         at: at
       }) do
-    at = at || EasyTime.utc_now(:second)
-    datetime_in_rfc1123 = EasyTime.to_rfc1123(at)
-    datetime_in_iso8601 = EasyTime.to_basic_iso8601(at)
-    date_in_iso8601 = DateTime.to_date(at) |> EasyTime.to_basic_iso8601()
+    at = at || utc_now(:second)
+    datetime_in_rfc1123 = to_rfc1123(at)
+    datetime_in_iso8601 = to_basic_iso8601(at)
+    date_in_iso8601 = DateTime.to_date(at) |> to_basic_iso8601()
 
     ctx = %{
       access_key_id: access_key_id,
@@ -65,9 +67,9 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
         bucket: bucket,
         at: at
       }) do
-    at = at || EasyTime.utc_now(:second)
-    datetime_in_iso8601 = EasyTime.to_basic_iso8601(at)
-    date_in_iso8601 = DateTime.to_date(at) |> EasyTime.to_basic_iso8601()
+    at = at || utc_now(:second)
+    datetime_in_iso8601 = to_basic_iso8601(at)
+    date_in_iso8601 = DateTime.to_date(at) |> to_basic_iso8601()
 
     ctx = %{
       access_key_id: access_key_id,
@@ -92,9 +94,9 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
         bucket: bucket,
         at: at
       }) do
-    at = at || EasyTime.utc_now(:second)
-    datetime_in_iso8601 = EasyTime.to_basic_iso8601(at)
-    date_in_iso8601 = DateTime.to_date(at) |> EasyTime.to_basic_iso8601()
+    at = at || utc_now(:second)
+    datetime_in_iso8601 = to_basic_iso8601(at)
+    date_in_iso8601 = DateTime.to_date(at) |> to_basic_iso8601()
 
     ctx = %{
       access_key_id: access_key_id,
