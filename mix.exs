@@ -4,6 +4,7 @@ defmodule AlibabaCloudKit.MixProject do
   @version "0.6.0"
   @description "A kit for Alibaba Cloud or Aliyun."
   @source_url "https://github.com/cozy-elixir/alibaba_cloud_kit"
+  @changelog_url "https://github.com/cozy-elixir/alibaba_cloud_kit/blob/v#{@version}/CHANGELOG.md"
 
   def project do
     [
@@ -52,7 +53,7 @@ defmodule AlibabaCloudKit.MixProject do
 
   defp docs do
     [
-      extras: ["README.md"],
+      extras: ["README.md", "CHANGELOG.md"],
       source_url: @source_url,
       source_ref: "v#{@version}"
     ]
@@ -62,7 +63,10 @@ defmodule AlibabaCloudKit.MixProject do
     [
       exclude_patterns: [],
       licenses: ["Apache-2.0"],
-      links: %{GitHub: @source_url}
+      links: %{
+        GitHub: @source_url,
+        Changelog: @changelog_url
+      }
     ]
   end
 
