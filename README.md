@@ -15,14 +15,14 @@ Add `:alibaba_cloud_kit` to the list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:alibaba_cloud_kit, "~> <version>"}
+    {:alibaba_cloud_kit, "<requirement>"}
   ]
 end
 ```
 
 ## Usage
 
-For more information, see the [documentation](https://hexdocs.pm/alibaba_cloud_kit/AlibabaCloudKit.html).
+For more information, see the [documentation](https://hexdocs.pm/alibaba_cloud_kit).
 
 ## License
 

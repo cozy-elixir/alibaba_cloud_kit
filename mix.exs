@@ -39,6 +39,7 @@ defmodule AlibabaCloudKit.MixProject do
       {:nimble_options, "~> 1.0"},
       {:http_spec, "~> 2.1"},
       {:jxon, "~> 0.1"},
+      {:mime, "~> 2.0"},
       {:jason, "~> 1.0", only: [:dev, :test]},
       {:tesla, "~> 1.11", only: [:test]},
       {:ex_check, ">= 0.0.0", only: [:dev], runtime: false},
@@ -52,7 +53,6 @@ defmodule AlibabaCloudKit.MixProject do
   defp docs do
     [
       extras: ["README.md"],
-      main: "readme",
       source_url: @source_url,
       source_ref: "v#{@version}"
     ]
