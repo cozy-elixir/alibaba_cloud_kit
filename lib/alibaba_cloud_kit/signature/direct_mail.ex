@@ -1,0 +1,151 @@
+defmodule AlibabaCloudKit.Signature.DirectMail do
+  @moduledoc """
+  A implementation for DirectMail signature.
+
+  > I don't know the exact name of this type of signature, so let's call it
+  > DirectMail for now.
+
+  This type of signature is used by:
+
+     * Direct Mail (DM)
+
+  Read more at:
+
+    * [Direct Mail > API Reference > Call Method](https://www.alibabacloud.com/help/en/direct-mail/call-method/)
+    * [邮件推送 > API 参考 > 调用方式](https://help.aliyun.com/zh/direct-mail/call-method/)
+
+  """
+
+  import AlibabaCloudKit.Utils,
+    only: [
+      random_string: 0,
+      hmac_sha1: 2,
+      base64: 1
+    ]
+
+  alias HTTPSpec.Request
+  alias AlibabaCloudKit.EasyTime
+
+  @sign_opts_definition NimbleOptions.new!(
+                          access_key_id: [
+                            type: :string,
+                            required: true
+                          ],
+                          access_key_secret: [
+                            type: :string,
+                            required: true
+                          ],
+                          at: [
+                            type: {:or, [{:struct, DateTime}, nil]},
+                            default: nil
+                          ]
+                        )
+
+  @doc """
+  Signs a request.
+  """
+  # @spec sign_request!(Request.t(), sign_opts()) :: Request.t()
+  def sign(%Request{} = request, opts) when is_list(opts) do
+    opts =
+      opts
+      |> NimbleOptions.validate!(@sign_opts_definition)
+      |> Map.new()
+
+    %{
+      access_key_id: access_key_id,
+      access_key_secret: access_key_secret,
+      at: at
+    } = opts
+
+    at = at || EasyTime.utc_now(:second)
+
+    default_params = %{
+      "AccessKeyId" => access_key_id,
+      "SignatureMethod" => "HMAC-SHA1",
+      "SignatureVersion" => "1.0",
+      "SignatureNonce" => random_string(),
+      "Timestamp" => EasyTime.to_extended_iso8601(at)
+    }
+
+    request
+    |> put_default_params(default_params)
+    |> put_signature(access_key_secret)
+  end
+
+  defp put_default_params(%Request{method: :get} = request, default_params) do
+    params = URI.decode_query(request.query, %{}, :rfc3986)
+    query = default_params |> Map.merge(params) |> URI.encode_query(:rfc3986)
+    %{request | query: query}
+  end
+
+  defp put_default_params(%Request{method: :post} = request, default_params) do
+    params = URI.decode_query(request.body, %{}, :www_form)
+    body = default_params |> Map.merge(params) |> URI.encode_query(:www_form)
+    %{request | body: body}
+  end
+
+  defp put_signature(%Request{method: :get} = request, access_key_secret) do
+    signature = build_signature(request, access_key_secret)
+
+    query =
+      request.query
+      |> URI.decode_query(%{}, :rfc3986)
+      |> Map.put("Signature", signature)
+      |> URI.encode_query(:rfc3986)
+
+    %{request | query: query}
+  end
+
+  defp put_signature(%Request{method: :post} = request, access_key_secret) do
+    signature = build_signature(request, access_key_secret)
+
+    body =
+      request.body
+      |> URI.decode_query(%{}, :www_form)
+      |> Map.put("Signature", signature)
+      |> URI.encode_query(:www_form)
+
+    %{request | body: body}
+  end
+
+  defp build_signature(request, secret) do
+    "#{secret}&"
+    |> hmac_sha1(build_string_to_sign(request))
+    |> base64()
+  end
+
+  defp build_string_to_sign(request) do
+    [
+      build_canonical_method(request),
+      build_canonical_path(request),
+      build_canonical_params(request)
+    ]
+    |> Enum.map_join("&", &encode_rfc3986_value/1)
+  end
+
+  defp build_canonical_method(request) do
+    Request.build_method(request)
+  end
+
+  defp build_canonical_path(request) do
+    request.path
+  end
+
+  defp build_canonical_params(%Request{method: :get} = request) do
+    request.query
+    |> URI.decode_query(%{}, :rfc3986)
+    |> Enum.sort()
+    |> URI.encode_query(:rfc3986)
+  end
+
+  defp build_canonical_params(%Request{method: :post} = request) do
+    request.body
+    |> URI.decode_query(%{}, :www_form)
+    |> Enum.sort()
+    |> URI.encode_query(:rfc3986)
+  end
+
+  defp encode_rfc3986_value(string) when is_binary(string) do
+    URI.encode(string, &URI.char_unreserved?/1)
+  end
+end

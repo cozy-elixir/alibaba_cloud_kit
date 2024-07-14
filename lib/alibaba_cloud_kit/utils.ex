@@ -37,6 +37,11 @@ defmodule AlibabaCloudKit.Utils do
   end
 
   @doc false
+  def hmac_sha1(key, data) do
+    :crypto.mac(:hmac, :sha, key, data)
+  end
+
+  @doc false
   def sha256(data) do
     :crypto.hash(:sha256, data)
   end
