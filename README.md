@@ -24,6 +24,25 @@ end
 
 For more information, see the [documentation](https://hexdocs.pm/alibaba_cloud_kit).
 
+## Tests
+
+Run basic tests:
+
+```console
+$ mix test
+```
+
+Run all tests:
+
+```console
+$ export TEST_ACCESS_KEY_ID=...
+$ export TEST_ACCESS_KEY_SECRET=...
+$ export TEST_OSS_REGION=...
+$ export TEST_OSS_BUCKET=...
+
+$ mix test --include external:true
+```
+
 ## License
 
 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
