@@ -1,6 +1,6 @@
 defmodule AlibabaCloudKit.Signature.ACS3 do
   @moduledoc """
-  A implementation for ACS V3 signature.
+  An implementation for ACS V3 signature.
 
   This type of signature is used by most of RPC style APIs:
 

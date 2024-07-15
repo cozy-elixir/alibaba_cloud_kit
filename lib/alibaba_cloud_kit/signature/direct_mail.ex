@@ -1,6 +1,6 @@
 defmodule AlibabaCloudKit.Signature.DirectMail do
   @moduledoc """
-  A implementation for DirectMail signature.
+  An implementation for DirectMail signature.
 
   > I don't know the exact name of this type of signature, so let's call it
   > DirectMail for now.

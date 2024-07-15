@@ -1,6 +1,6 @@
 defmodule AlibabaCloudKit.Signature.OSS4 do
   @moduledoc """
-  A implementation for OSS V4 signature.
+  An implementation for OSS V4 signature.
 
   This type of signature is used by:
 
