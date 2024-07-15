@@ -2,15 +2,16 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
   @moduledoc """
   A implementation for OSS V4 signature.
 
+  This type of signature is used by:
+
+    * Object Storage Service (OSS)
+
   Read more at:
 
     * [Object Storage Service > Developer Reference > Use the RESTful API to initiate requests](https://www.alibabacloud.com/help/en/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
     * [对象存储 > 开发参考 > 开发指南 > 使用 REST API 发起请求](https://help.aliyun.com/zh/oss/developer-reference/use-the-restful-api-to-initiate-requests/)
 
   """
-
-  alias HTTPSpec.Request
-  alias AlibabaCloudKit.OSS.Object.PostPolicy
 
   import AlibabaCloudKit.Utils,
     only: [
@@ -26,19 +27,155 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
       base64: 1
     ]
 
+  alias HTTPSpec.Request
+  alias AlibabaCloudKit.OSS.Object.PostPolicy
+
+  @type access_key_id :: String.t()
+  @type access_key_secret :: String.t()
+  @type region :: String.t()
+  @type bucket :: String.t() | nil
+  @type sign_type :: :header | :query
+  @type at :: DateTime.t() | nil
+
+  @type sign_opt ::
+          {:access_key_id, access_key_id()}
+          | {:access_key_secret, access_key_secret()}
+          | {:region, region()}
+          | {:bucket, bucket()}
+          | {:sign_type, sign_type()}
+          | {:at, at()}
+  @type sign_opts :: [sign_opt()]
+
+  @sign_opts_definition NimbleOptions.new!(
+                          access_key_id: [
+                            type: :string,
+                            required: true
+                          ],
+                          access_key_secret: [
+                            type: :string,
+                            required: true
+                          ],
+                          region: [
+                            type: :string,
+                            required: true
+                          ],
+                          bucket: [
+                            type: {:or, [:string, nil]},
+                            default: nil
+                          ],
+                          sign_type: [
+                            type: {:in, [:header, :query]},
+                            default: :header
+                          ],
+                          at: [
+                            type: {:or, [{:struct, DateTime}, nil]},
+                            default: nil
+                          ]
+                        )
+
   @signature_version "OSS4-HMAC-SHA256"
   @access_key_version "aliyun_v4"
   @request_version "aliyun_v4_request"
   @service_name "oss"
 
-  def sign(%Request{} = request, %{
-        access_key_id: access_key_id,
-        access_key_secret: access_key_secret,
-        region: region,
-        bucket: bucket,
-        sign_type: sign_type,
-        at: at
-      }) do
+  @doc """
+  Signs a request.
+
+  ## The location to put signature
+
+  The location to put signature is controlled by the `:sign_type` option:
+
+    * `:header` (default) - add signature to the headers of a request.
+    * `:query` - add signature to the query of a request.
+
+  ### Automatically added request headers when using `:header` sign type
+
+  Following headers will be added to the request automatically:
+
+    * `host`
+    * `date`
+    * `content-md5` (overridable)
+    * `content-type` (overridable)
+    * `x-oss-date`
+    * `x-oss-content-sha256`
+    * `authorization`
+
+  ### Automatically added request queries when using `:query` sign type
+
+  Following queries will be added to the request automatically:
+
+    * `x-oss-signature-version`
+    * `x-oss-credential`
+    * `x-oss-date`
+    * `x-oss-expires` (overridable)
+    * `x-oss-additional-headers`
+
+  ## Required headers
+
+  All necessary headers of requests will be generated automatically. You don't
+  have to specifically set them, unless you want to customize it.
+
+  ## Examples
+
+  ### Build and sign a request for `ListBucktets` operation
+
+      request = HTTPSpec.Request.new!(
+        method: :get,
+        scheme: :https,
+        host: "oss-us-west-1.aliyuncs.com",
+        port: 443,
+        path: "/"
+      )
+
+      opts = [
+        access_key_id: "...",
+        access_key_secret: "...",
+        region: "oss-us-west-1",
+        sign_type: :header
+      ]
+
+      AlibabaCloudKit.Signature.OSS4.sign!(request, opts)
+
+  ### Build a pre-signed url for `GetObject` operation
+
+      request = HTTPSpec.Request.new!(
+        method: :get,
+        scheme: :https,
+        host: "example-bucket.oss-us-west-1.aliyuncs.com",
+        port: 443,
+        path: "/example-object",
+        headers: [
+          {"x-oss-expires", "900"}
+        ]
+      )
+
+      opts = [
+        access_key_id: "...",
+        access_key_secret: "...",
+        region: "oss-us-west-1",
+        bucket: "example-bucket",
+        sign_type: :query
+      ]
+
+      request
+      |> AlibabaCloudKit.Signature.OSS4.sign!(opts)
+      |> HTTPSpec.Request.build_url()
+
+  """
+  @spec sign!(Request.t(), sign_opts()) :: Request.t()
+  def sign!(%Request{} = request, opts) do
+    %{
+      access_key_id: access_key_id,
+      access_key_secret: access_key_secret,
+      region: region,
+      bucket: bucket,
+      sign_type: sign_type,
+      at: at
+    } =
+      opts
+      |> NimbleOptions.validate!(@sign_opts_definition)
+      |> Map.new()
+
     at = at || utc_now(:second)
     datetime_in_rfc1123 = to_rfc1123(at)
     datetime_in_iso8601 = to_basic_iso8601(at)
@@ -60,6 +197,7 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
     |> put_signature(ctx)
   end
 
+  @doc false
   def sign(%PostPolicy{} = post_policy, %{
         access_key_id: access_key_id,
         access_key_secret: access_key_secret,

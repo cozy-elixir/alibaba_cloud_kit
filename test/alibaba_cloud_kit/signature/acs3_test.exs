@@ -1,10 +1,10 @@
-defmodule AlibabaCloudKit.RPCTest do
+defmodule AlibabaCloudKit.Signature.ACS3Test do
   use ExUnit.Case
 
-  alias AlibabaCloudKit.RPC
+  alias AlibabaCloudKit.Signature.ACS3
   alias HTTPSpec.Request
 
-  describe "sign_request!/2" do
+  describe "sign!/2" do
     setup do
       opts = [
         access_key_id: "access_key_id",
@@ -50,7 +50,7 @@ defmodule AlibabaCloudKit.RPCTest do
                    {"x-acs-signature-nonce", "6cdc1971b2470b4c83b78a35e2bc36ea"}
                  ]
                )
-               |> RPC.sign_request!(opts)
+               |> ACS3.sign!(opts)
     end
 
     test "works for POST request", %{opts: opts} do
@@ -90,7 +90,7 @@ defmodule AlibabaCloudKit.RPCTest do
                  ],
                  body: URI.encode_query(%{"RegionId" => "us-west-1"}, :www_form)
                )
-               |> RPC.sign_request!(opts)
+               |> ACS3.sign!(opts)
     end
   end
 
@@ -120,8 +120,8 @@ defmodule AlibabaCloudKit.RPCTest do
                    {"x-acs-action", "DescribeInstanceStatus"}
                  ]
                )
-               |> RPC.sign_request!(opts)
-               |> send_request()
+               |> ACS3.sign!(opts)
+               |> HTTPClient.send_request()
     end
 
     test "POST", %{opts: opts} do
@@ -139,17 +139,8 @@ defmodule AlibabaCloudKit.RPCTest do
                  ],
                  body: URI.encode_query(%{"RegionId" => "us-west-1"}, :www_form)
                )
-               |> RPC.sign_request!(opts)
-               |> send_request()
+               |> ACS3.sign!(opts)
+               |> HTTPClient.send_request()
     end
-  end
-
-  defp send_request(%HTTPSpec.Request{} = request) do
-    Tesla.request(
-      method: request.method,
-      url: HTTPSpec.Request.build_url(request),
-      headers: request.headers,
-      body: request.body
-    )
   end
 end

@@ -70,8 +70,16 @@ defmodule AlibabaCloudKit.MixProject do
     ]
   end
 
+  def cli do
+    [preferred_envs: ["test.all": :test]]
+  end
+
   defp aliases do
-    [publish: ["hex.publish", "tag"], tag: &tag_release/1]
+    [
+      publish: ["hex.publish", "tag"],
+      tag: &tag_release/1,
+      "test.all": "test --include external:true"
+    ]
   end
 
   defp tag_release(_) do

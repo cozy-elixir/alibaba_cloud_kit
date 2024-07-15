@@ -1,10 +1,10 @@
-defmodule AlibabaCloudKit.OSSTest do
+defmodule AlibabaCloudKit.Signature.OSS4Test do
   use ExUnit.Case
 
   alias HTTPSpec.Request
-  alias AlibabaCloudKit.OSS
+  alias AlibabaCloudKit.Signature.OSS4
 
-  describe "sign_request!/2" do
+  describe "sign!/2" do
     setup do
       opts = [
         access_key_id: "access_key_id",
@@ -53,7 +53,7 @@ defmodule AlibabaCloudKit.OSSTest do
                  {"authorization",
                   "OSS4-HMAC-SHA256 Credential=access_key_id/20231203/us-west-1/oss/aliyun_v4_request,AdditionalHeaders=host,Signature=5c2aa63aab5b9be722be76ecbffa5e93530961a37ab5b3b240167ad5c5eab8b3"}
                ]
-             ) == OSS.sign_request!(request, opts)
+             ) == OSS4.sign!(request, opts)
     end
 
     test "with sign_type: :query", %{opts: opts} do
@@ -87,7 +87,7 @@ defmodule AlibabaCloudKit.OSSTest do
                  {"date", "Sun, 03 Dec 2023 12:12:12 GMT"}
                ]
              } =
-               OSS.sign_request!(request, opts)
+               OSS4.sign!(request, opts)
 
       assert "x-oss-additional-headers=host&x-oss-credential=access_key_id%2F20231203%2Fus-west-1%2Foss%2Faliyun_v4_request&x-oss-date=20231203T121212Z&x-oss-expires=86400&x-oss-signature=249f96e9fc15147fcdfcd9f2686b6507ceabaa0c6eeb82b5a462dbc264a61030&x-oss-signature-version=OSS4-HMAC-SHA256" ==
                query
@@ -107,7 +107,7 @@ defmodule AlibabaCloudKit.OSSTest do
   describe "issues signed requests whose signature are added to header" do
     @describetag external: true
 
-    @example_image_binary "../files/lenna.png"
+    @example_image_binary "../../files/lenna.png"
                           |> Path.expand(__DIR__)
                           |> File.read!()
 
@@ -142,8 +142,8 @@ defmodule AlibabaCloudKit.OSSTest do
 
       assert {:ok, %{status: 200}} =
                request
-               |> OSS.sign_request!(opts)
-               |> send_request()
+               |> OSS4.sign!(opts)
+               |> HTTPClient.send_request()
     end
 
     test "works for Region operations - take DescribeRegions as example", %{
@@ -169,8 +169,8 @@ defmodule AlibabaCloudKit.OSSTest do
 
       assert {:ok, %{status: 200}} =
                request
-               |> OSS.sign_request!(opts)
-               |> send_request()
+               |> OSS4.sign!(opts)
+               |> HTTPClient.send_request()
     end
 
     test "works for Bucket operations - take ListObjectsV2 as example", %{
@@ -198,8 +198,8 @@ defmodule AlibabaCloudKit.OSSTest do
 
       assert {:ok, %{status: 200}} =
                request
-               |> OSS.sign_request!(opts)
-               |> send_request()
+               |> OSS4.sign!(opts)
+               |> HTTPClient.send_request()
     end
 
     test "works for Object operations - take PutObject as example", %{
@@ -227,8 +227,8 @@ defmodule AlibabaCloudKit.OSSTest do
 
       assert {:ok, %{status: 200}} =
                request
-               |> OSS.sign_request!(opts)
-               |> send_request()
+               |> OSS4.sign!(opts)
+               |> HTTPClient.send_request()
     end
 
     test "works for LiveChannel operations - take ListLiveChannel as example", %{
@@ -256,8 +256,8 @@ defmodule AlibabaCloudKit.OSSTest do
 
       assert {:ok, %{status: 200}} =
                request
-               |> OSS.sign_request!(opts)
-               |> send_request()
+               |> OSS4.sign!(opts)
+               |> HTTPClient.send_request()
     end
   end
 
@@ -298,22 +298,9 @@ defmodule AlibabaCloudKit.OSSTest do
 
       assert {:ok, %{status: 200}} =
                request
-               |> OSS.sign_request!(opts)
+               |> OSS4.sign!(opts)
                |> Request.build_url()
-               |> send_request()
+               |> HTTPClient.send_request()
     end
-  end
-
-  defp send_request(url) when is_binary(url) do
-    Tesla.get(url)
-  end
-
-  defp send_request(%HTTPSpec.Request{} = request) do
-    Tesla.request(
-      method: request.method,
-      url: HTTPSpec.Request.build_url(request),
-      headers: request.headers,
-      body: request.body
-    )
   end
 end

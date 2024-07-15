@@ -1,9 +1,11 @@
 defmodule AlibabaCloudKit.OSS.Object do
   @moduledoc """
-  Provides object related helpers.
+  Provides OSS object related helpers.
+
+  It's a high-level module built on top of `AlibabaCloudKit.Signature.OSS4`.
   """
 
-  alias AlibabaCloudKit.Signature
+  alias AlibabaCloudKit.Signature.OSS4
   alias AlibabaCloudKit.OSS.Object.PostPolicy
 
   @type access_key_id :: String.t()
@@ -52,12 +54,6 @@ defmodule AlibabaCloudKit.OSS.Object do
     * [PostObject](https://www.alibabacloud.com/help/en/oss/developer-reference/postobject/)
     * [PostObject (zh-Hans)](https://help.aliyun.com/zh/oss/developer-reference/postobject/)
 
-  ## Adding signature
-
-  This implementation has built-in OSS4 signature support.
-
-  > V1 signature is not supported.
-
   ## Examples
 
       region = "oss-us-west-1"
@@ -88,7 +84,7 @@ defmodule AlibabaCloudKit.OSS.Object do
         "x-oss-credential": x_oss_credential,
         "x-oss-date": x_oss_date,
         "x-oss-signature": x_oss_signature,
-      } = presign_post_object(conditions, seconds_to_expire, opts)
+      } = AlibabaCloudKit.OSS.presign_post_object(conditions, seconds_to_expire, opts)
 
   To use the returned data, you should built a form with multipart data, and send it:
 
@@ -129,7 +125,7 @@ defmodule AlibabaCloudKit.OSS.Object do
       credential: credential,
       datetime: datetime,
       at: at
-    } = Signature.OSS4.prepare_sign_info_for_post_policy(opts)
+    } = OSS4.prepare_sign_info_for_post_policy(opts)
 
     post_policy = %PostPolicy{
       expiration: build_expiration(at, seconds_to_expire),
@@ -145,7 +141,7 @@ defmodule AlibabaCloudKit.OSS.Object do
     %{
       post_policy: post_policy,
       signature: signature
-    } = Signature.OSS4.sign(post_policy, opts)
+    } = OSS4.sign(post_policy, opts)
 
     %{
       policy: post_policy,

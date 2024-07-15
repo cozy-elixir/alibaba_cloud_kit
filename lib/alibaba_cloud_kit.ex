@@ -9,25 +9,24 @@ defmodule AlibabaCloudKit do
 
   For a variety of reasons, Alibaba Cloud involves several different API styles:
 
-  * RPC
-  * ROA
-  * OSS
+    * RPC
+      * Elastic Compute Service (ECS)
+      * Content Delivery Network (CDN)
+      * ApsaraDB RDS
+      * ...
+    * ROA
+      * Application Real-Time Monitoring Service (ARMS)
+      * Batch Compute, Container Service for Kubernetes (ACK)
+      * Elasticsearch
+      * ...
+    * OSS
+      * Object Storage Service (OSS)
 
-  These different API styles are supported by different modules:
+  ## Check style of an API
 
-  * `AlibabaCloudKit.RPC`
-  * `AlibabaCloudKit.ROA`
-  * `AlibabaCloudKit.OSS`
-
-  > Q: Which style should I use?
-  >
-  > A: You should check the API style by yourself. See next section for more.
-
-  ## Check API style
-
-  1. Visit [OpenAPI Explorer](https://next.api.alibabacloud.com/).
-  2. Search the API you wanna use.
-  3. Check the metadata, and the the metadata should like this:
+    1. Visit [OpenAPI Explorer](https://next.api.alibabacloud.com/).
+    2. Search the API you wanna use.
+    3. Check the metadata, and the the metadata should like this:
 
   ```json
   {
@@ -41,12 +40,14 @@ defmodule AlibabaCloudKit do
   }
   ```
 
-  ## Authentication
+  ## Build and send an API request
 
-  Different styles of API use different signature mechanisms to authenticate an
-  API request.
+  Despite the diversity of API styles, their request flow is consistent:
 
-  The `AlibabaCloudKit.*` modules will try their best to provide relevant helpers.
+    1. build a request according to the official docs. (by [http_spec](https://hex.pm/packages/http_spec))
+    2. sign the request. (**this package helps to do it**)
+    3. send the request via your preferred HTTP client. (in your application code)
+    4. process the response. (in your application code)
 
   ## Authorization
 

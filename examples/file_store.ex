@@ -5,6 +5,7 @@ defmodule FileStore do
 
   alias HTTPSpec.Request
   alias AlibabaCloudKit.OSS
+  alias AlibabaCloudKit.Signature.OSS4
 
   def put_file(key, data) when is_binary(key) and is_binary(key) do
     request =
@@ -17,7 +18,7 @@ defmodule FileStore do
     opts = build_opts(sign_type: :header)
 
     request
-    |> OSS.sign_request!(opts)
+    |> OSS4.sign!(opts)
     |> send_request()
     |> case do
       {:ok, %{status: 200}} -> {:ok, key}
@@ -35,7 +36,7 @@ defmodule FileStore do
     opts = build_opts(sign_type: :header)
 
     request
-    |> OSS.sign_request!(opts)
+    |> OSS4.sign!(opts)
     |> send_request()
     |> case do
       {:ok, %{status: 200, body: data}} -> {:ok, data}
@@ -53,7 +54,7 @@ defmodule FileStore do
     opts = build_opts(sign_type: :header)
 
     request
-    |> OSS.sign_request!(opts)
+    |> OSS4.sign!(opts)
     |> send_request()
     |> case do
       {:ok, %{status: 204}} -> {:ok, key}
@@ -72,7 +73,7 @@ defmodule FileStore do
     opts = build_opts(sign_type: :query)
 
     request
-    |> OSS.sign_request!(opts)
+    |> OSS4.sign!(opts)
     |> Request.build_url()
   end
 

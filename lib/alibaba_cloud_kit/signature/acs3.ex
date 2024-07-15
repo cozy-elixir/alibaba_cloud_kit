@@ -2,6 +2,13 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
   @moduledoc """
   A implementation for ACS V3 signature.
 
+  This type of signature is used by most of RPC style APIs:
+
+    * Elastic Compute Service (ECS)
+    * Content Delivery Network (CDN)
+    * ApsaraDB RDS
+    * ...
+
   Read more at:
 
     * [Alibaba Cloud SDK > Product Overview > Request syntax and signature method V3](https://www.alibabacloud.com/help/en/sdk/product-overview/v3-request-structure-and-signature)
@@ -21,13 +28,104 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
 
   alias HTTPSpec.Request
 
+  @type access_key_id :: String.t()
+  @type access_key_secret :: String.t()
+  @type at :: DateTime.t() | nil
+
+  @type sign_opt ::
+          {:access_key_id, access_key_id()}
+          | {:access_key_secret, access_key_secret()}
+          | {:at, at()}
+  @type sign_opts :: [sign_opt()]
+
+  @sign_opts_definition NimbleOptions.new!(
+                          access_key_id: [
+                            type: :string,
+                            required: true
+                          ],
+                          access_key_secret: [
+                            type: :string,
+                            required: true
+                          ],
+                          at: [
+                            type: {:or, [{:struct, DateTime}, nil]},
+                            default: nil
+                          ]
+                        )
+
   @signature_version "ACS3-HMAC-SHA256"
 
-  def sign(%Request{} = request, %{
-        access_key_id: access_key_id,
-        access_key_secret: access_key_secret,
-        at: at
-      }) do
+  @doc """
+  Signs a request.
+
+  ## Automatically added request headers
+
+  Following headers will be added to the request automatically:
+
+    * `host`
+    * `x-acs-date`
+    * `x-acs-content-sha256`
+    * `x-acs-signature-nonce`
+    * `authorization`
+
+  ## Examples
+
+  ### Build and sign a GET request
+
+      request = HTTPSpec.Request.new!(
+        method: :get,
+        scheme: :https,
+        host: "ecs-us-west-1.aliyuncs.com",
+        port: 443,
+        path: "/",
+        query: URI.encode_query(%{"RegionId" => "us-west-1"}, :rfc3986),
+        headers: [
+          {"x-acs-version", "2014-05-26"},
+          {"x-acs-action", "DescribeInstanceStatus"}
+        ]
+      )
+
+      opts = [
+        access_key_id: "...",
+        access_key_secret: "..."
+      ]
+
+      AlibabaCloudKit.Signature.ACS3.sign!(request, opts)
+
+  ### Build and sign a POST request
+
+      request = HTTPSpec.Request.new!(
+        method: :post,
+        scheme: :https,
+        host: "ecs-us-west-1.aliyuncs.com",
+        port: 443,
+        path: "/",
+        headers: [
+          {"content-type", "application/x-www-form-urlencoded"},
+          {"x-acs-version", "2014-05-26"},
+          {"x-acs-action", "DescribeInstanceStatus"}
+        ],
+        body: URI.encode_query(%{"RegionId" => "us-west-1"}, :www_form)
+      )
+
+      opts = [
+        access_key_id: "...",
+        access_key_secret: "..."
+      ]
+
+      AlibabaCloudKit.Signature.ACS3.sign!(request, opts)
+
+  """
+  def sign!(%Request{} = request, opts) do
+    %{
+      access_key_id: access_key_id,
+      access_key_secret: access_key_secret,
+      at: at
+    } =
+      opts
+      |> NimbleOptions.validate!(@sign_opts_definition)
+      |> Map.new()
+
     at = at || utc_now(:second)
     datetime = to_extended_iso8601(at)
 

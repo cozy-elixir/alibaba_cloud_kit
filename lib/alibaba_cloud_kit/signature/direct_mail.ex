@@ -28,6 +28,16 @@ defmodule AlibabaCloudKit.Signature.DirectMail do
 
   alias HTTPSpec.Request
 
+  @type access_key_id :: String.t()
+  @type access_key_secret :: String.t()
+  @type at :: DateTime.t() | nil
+
+  @type sign_opt ::
+          {:access_key_id, access_key_id()}
+          | {:access_key_secret, access_key_secret()}
+          | {:at, at()}
+  @type sign_opts :: [sign_opt()]
+
   @sign_opts_definition NimbleOptions.new!(
                           access_key_id: [
                             type: :string,
@@ -45,9 +55,89 @@ defmodule AlibabaCloudKit.Signature.DirectMail do
 
   @doc """
   Signs a request.
+
+  ## Automatically added params
+
+  Following params will be added to the request automatically:
+
+    * `AccessKeyId`
+    * `SignatureMethod`
+    * `SignatureVersion`
+    * `SignatureNonce`
+    * `Signature`
+    * `Timestamp`
+
+  For GET requests, they will be added to query. For POST requests, they will be
+  added to body.
+
+  ## Examples
+
+  ### Build and sign a GET request
+
+      params = %{
+        "Format" => "JSON",
+        "Version" => "2015-11-23",
+        "Action" => "SingleSendMail",
+        "AccountName" => "admin@alibabacloudkit.com",
+        "AddressType" => "1",
+        "ReplyToAddress" => "false",
+        "FromAlias" => "AlibabaCloudKit Group",
+        "Subject" => "Announcement of AlibabaCloudKit",
+        "ToAddress" => "test@user.com",
+        "TextBody" => "This is the email send by AlibabaCloudKit."
+      }
+
+      opts = [
+        access_key_id: "access_key_id",
+        access_key_secret: "access_key_secret"
+      ]
+
+      Request.new!(
+        method: :get,
+        scheme: :https,
+        host: "dm.aliyuncs.com",
+        port: 443,
+        path: "/",
+        query: URI.encode_query(params, :rfc3986)
+      )
+      |> AlibabaCloudKit.Signature.DirectMail.sign!(opts)
+
+  ### Build and sign a POST request
+
+      params = %{
+        "Format" => "JSON",
+        "Version" => "2015-11-23",
+        "Action" => "SingleSendMail",
+        "AccountName" => "admin@alibabacloudkit.com",
+        "AddressType" => "1",
+        "ReplyToAddress" => "false",
+        "FromAlias" => "AlibabaCloudKit Group",
+        "Subject" => "Announcement of AlibabaCloudKit",
+        "ToAddress" => "test@user.com",
+        "TextBody" => "This is the email send by AlibabaCloudKit."
+      }
+
+      opts = [
+        access_key_id: "access_key_id",
+        access_key_secret: "access_key_secret"
+      ]
+
+      Request.new!(
+        method: :post,
+        scheme: :https,
+        host: "dm.aliyuncs.com",
+        port: 443,
+        path: "/",
+        headers: [
+          {"content-type", "application/x-www-form-urlencoded"}
+        ],
+        body: URI.encode_query(params, :www_form)
+      )
+      |> AlibabaCloudKit.Signature.DirectMail.sign!(opts)
+
   """
-  # @spec sign_request!(Request.t(), sign_opts()) :: Request.t()
-  def sign(%Request{} = request, opts) when is_list(opts) do
+  @spec sign!(Request.t(), sign_opts()) :: Request.t()
+  def sign!(%Request{} = request, opts) when is_list(opts) do
     opts =
       opts
       |> NimbleOptions.validate!(@sign_opts_definition)
