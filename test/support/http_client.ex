@@ -1,4 +1,6 @@
 defmodule HTTPClient do
+  @moduledoc false
+
   def send_request(url) when is_binary(url) do
     Tesla.get(url)
   end
