@@ -92,7 +92,7 @@ defmodule AlibabaCloudKit.Signature.DirectMail do
         access_key_secret: "access_key_secret"
       ]
 
-      Request.new!(
+      HTTPSpec.Request.new!(
         method: :get,
         scheme: :https,
         host: "dm.aliyuncs.com",
@@ -122,7 +122,7 @@ defmodule AlibabaCloudKit.Signature.DirectMail do
         access_key_secret: "access_key_secret"
       ]
 
-      Request.new!(
+      HTTPSpec.Request.new!(
         method: :post,
         scheme: :https,
         host: "dm.aliyuncs.com",
