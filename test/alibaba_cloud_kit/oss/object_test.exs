@@ -14,7 +14,10 @@ defmodule AlibabaCloudKit.OSS.ObjectTest do
 
   # Because the internal of JSON encoder, encoding a map won't always produce
   # the same string on different platforms, which will cause the test to fail.
+  #
   # To make the CI pass, I tag these tests, and ignore them from normal flow.
+  # Their correctness will be verified by the integration tests in
+  # `test/examples/file_store_test.exs`.
 
   @tag uncertain: true
   test "presign_post_object/3", %{
