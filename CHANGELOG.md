@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- add `AlibabaCloudKit.OSS.Object.presign_post_object_v1/3`
+
 ## v1.0.0
 
 - rename this package from `aliyun_open_api` to `alibaba_cloud_kit`.

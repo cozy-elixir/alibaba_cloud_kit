@@ -37,13 +37,42 @@ defmodule FileStoreTest do
   test "presigns a file and uploading a file with related information" do
     alias Tesla.Multipart
 
-    remote_path = "examples/file_store/presign/lenna.png"
+    key = "examples/file_store/presign/lenna.png"
 
     %{
       endpoint: endpoint,
       method: method,
       fields: fields
-    } = FileStore.presign_file(remote_path)
+    } = FileStore.presign_file(key)
+
+    multipart =
+      Multipart.new()
+      |> then(
+        &Enum.reduce(fields, &1, fn {k, v}, multipart ->
+          Multipart.add_field(multipart, k, v)
+        end)
+      )
+      |> Multipart.add_file_content(@example_image_binary, Path.basename(fields.key))
+
+    assert {:ok, %{status: 204}} =
+             Tesla.request(
+               method: method,
+               url: endpoint,
+               body: multipart
+             )
+  end
+
+  @tag external: true
+  test "presigns a file with OSS v1 signature and uploading a file with related information" do
+    alias Tesla.Multipart
+
+    key = "examples/file_store/presign_v1/lenna.png"
+
+    %{
+      endpoint: endpoint,
+      method: method,
+      fields: fields
+    } = FileStore.presign_file_v1(key)
 
     multipart =
       Multipart.new()

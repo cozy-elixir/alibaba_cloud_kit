@@ -115,6 +115,36 @@ defmodule FileStore do
     }
   end
 
+  def presign_file_v1(key) when is_binary(key) do
+    conditions = [
+      ["eq", "$key", key],
+      ["eq", "$x-oss-object-acl", @acl],
+      ["content-length-range", 1, @max_size_in_bytes]
+    ]
+
+    opts = build_opts()
+
+    endpoint = "https://#{opts[:bucket]}.#{opts[:region]}.aliyuncs.com"
+    access_key_id = opts[:access_key_id]
+
+    %{
+      policy: policy,
+      signature: signature
+    } = OSS.Object.presign_post_object_v1(conditions, @seconds_to_expire, opts)
+
+    %{
+      endpoint: endpoint,
+      method: :post,
+      fields: %{
+        key: key,
+        "x-oss-object-acl": @acl,
+        OSSAccessKeyId: access_key_id,
+        policy: policy,
+        Signature: signature
+      }
+    }
+  end
+
   defp build_request(overrides) when is_list(overrides) do
     config =
       :demo
