@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.0.0
 
 - rename this package from `aliyun_open_api` to `alibaba_cloud_kit`.
-- adjust all the code
+- rewrite all the code to fit my new idea.
