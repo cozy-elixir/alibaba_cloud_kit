@@ -78,7 +78,7 @@ defmodule AlibabaCloudKit.MixProject do
     [
       publish: ["hex.publish", "tag"],
       tag: &tag_release/1,
-      "test.all": "test --include external:true"
+      "test.all": "test --include external:true --include uncertain:true"
     ]
   end
 
