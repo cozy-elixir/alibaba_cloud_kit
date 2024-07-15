@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.1.0
 
 - add `AlibabaCloudKit.OSS.Object.presign_post_object_v1/3`
 
