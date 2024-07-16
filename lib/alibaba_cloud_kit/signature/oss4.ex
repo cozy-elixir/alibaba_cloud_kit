@@ -144,9 +144,7 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
         host: "example-bucket.oss-us-west-1.aliyuncs.com",
         port: 443,
         path: "/example-object",
-        headers: [
-          {"x-oss-expires", "900"}
-        ]
+        query: "x-oss-expires=900"
       )
 
       opts = [

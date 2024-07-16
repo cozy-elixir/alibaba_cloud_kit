@@ -80,9 +80,9 @@ defmodule AlibabaCloudKit.OSS.Object do
 
       %{
         policy: policy,
-        "x-oss-signature-version": x_oss_signature_version,
         "x-oss-credential": x_oss_credential,
         "x-oss-date": x_oss_date,
+        "x-oss-signature-version": x_oss_signature_version,
         "x-oss-signature": x_oss_signature,
       } = AlibabaCloudKit.OSS.presign_post_object(conditions, seconds_to_expire, opts)
 
