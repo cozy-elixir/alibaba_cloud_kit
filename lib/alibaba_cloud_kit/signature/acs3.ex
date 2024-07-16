@@ -20,6 +20,7 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
     only: [
       utc_now: 1,
       to_extended_iso8601: 1,
+      encode_rfc3986: 1,
       random_string: 0,
       sha256: 1,
       hmac_sha256: 2,
@@ -192,7 +193,9 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
 
   defp build_canonical_path(request) do
     request.path
-    |> URI.encode()
+    |> URI.decode()
+    |> String.split("/")
+    |> Enum.map_join("/", &encode_rfc3986/1)
   end
 
   defp build_canonical_querystring(request) do

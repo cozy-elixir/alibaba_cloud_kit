@@ -387,7 +387,8 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
       do: "/#{bucket}#{URI.decode(path)}",
       else: URI.decode(path)
     )
-    |> URI.encode()
+    |> String.split("/")
+    |> Enum.map_join("/", &encode_rfc3986/1)
   end
 
   defp build_canonical_querystring(request) do
