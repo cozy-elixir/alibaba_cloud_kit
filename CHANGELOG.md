@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.1
+## v1.1.2 / v1.1.1
 
 - fix bad OSS4 signature when the URL contains escaped characters.
 

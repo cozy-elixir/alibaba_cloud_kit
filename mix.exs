@@ -1,7 +1,7 @@
 defmodule AlibabaCloudKit.MixProject do
   use Mix.Project
 
-  @version "1.1.1"
+  @version "1.1.2"
   @description "A kit for Alibaba Cloud or Aliyun."
   @source_url "https://github.com/cozy-elixir/alibaba_cloud_kit"
   @changelog_url "https://github.com/cozy-elixir/alibaba_cloud_kit/blob/v#{@version}/CHANGELOG.md"
