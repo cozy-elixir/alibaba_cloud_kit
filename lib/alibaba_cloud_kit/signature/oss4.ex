@@ -105,6 +105,7 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
   Following queries will be added to the request automatically:
 
     * `x-oss-signature-version`
+    * `x-oss-signature`
     * `x-oss-credential`
     * `x-oss-date`
     * `x-oss-expires` (overridable)
