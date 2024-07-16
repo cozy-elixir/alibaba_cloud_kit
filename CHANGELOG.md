@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.1
+
+- fix bad OSS4 signature when the URL contains escaped characters.
+
 ## v1.1.0
 
 - add `AlibabaCloudKit.OSS.Object.presign_post_object_v1/3`
