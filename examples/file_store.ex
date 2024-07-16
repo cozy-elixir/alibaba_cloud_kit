@@ -11,7 +11,7 @@ defmodule FileStore do
     request =
       build_request(
         method: :put,
-        path: Path.join("/", key),
+        path: URI.encode(Path.join("/", key)),
         body: data
       )
 
@@ -30,7 +30,7 @@ defmodule FileStore do
     request =
       build_request(
         method: :get,
-        path: Path.join("/", key)
+        path: URI.encode(Path.join("/", key))
       )
 
     opts = build_opts(sign_type: :header)
@@ -48,7 +48,7 @@ defmodule FileStore do
     request =
       build_request(
         method: :delete,
-        path: Path.join("/", key)
+        path: URI.encode(Path.join("/", key))
       )
 
     opts = build_opts(sign_type: :header)
@@ -66,7 +66,7 @@ defmodule FileStore do
     request =
       build_request(
         method: :get,
-        path: Path.join("/", key),
+        path: URI.encode(Path.join("/", key)),
         query: "x-oss-expires=300"
       )
 

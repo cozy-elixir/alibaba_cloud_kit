@@ -384,8 +384,8 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
     path = request.path
 
     if(bucket,
-      do: "/#{bucket}#{path}",
-      else: path
+      do: "/#{bucket}#{URI.decode(path)}",
+      else: URI.decode(path)
     )
     |> URI.encode()
   end

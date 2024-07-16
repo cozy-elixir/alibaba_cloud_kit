@@ -18,7 +18,7 @@ defmodule FileStoreTest do
 
   @tag external: true
   test "manage files" do
-    key = "examples/file_store/temporary/lenna.png"
+    key = "examples/file_store/temporary/lenna woman.png"
     assert {:ok, _key} = FileStore.put_file(key, @example_image_binary)
     assert {:ok, _data} = FileStore.get_file(key)
     assert {:ok, _key} = FileStore.delete_file(key)
@@ -27,7 +27,7 @@ defmodule FileStoreTest do
 
   @tag external: true
   test "generates a signed URL which can be accessed in Web browser" do
-    key = "examples/file_store/persistent/lenna.png"
+    key = "examples/file_store/persistent/lenna woman.png"
     {:ok, key} = FileStore.put_file(key, @example_image_binary)
     url = FileStore.get_access_url(key)
     assert {:ok, %{status: 200}} = Tesla.get(url)
@@ -37,7 +37,7 @@ defmodule FileStoreTest do
   test "presigns a file and uploading a file with related information" do
     alias Tesla.Multipart
 
-    key = "examples/file_store/presign/lenna.png"
+    key = "examples/file_store/presign/lenna woman.png"
 
     %{
       endpoint: endpoint,
@@ -66,7 +66,7 @@ defmodule FileStoreTest do
   test "presigns a file with OSS v1 signature and uploading a file with related information" do
     alias Tesla.Multipart
 
-    key = "examples/file_store/presign_v1/lenna.png"
+    key = "examples/file_store/presign_v1/lenna woman.png"
 
     %{
       endpoint: endpoint,
