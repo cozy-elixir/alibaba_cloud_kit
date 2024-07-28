@@ -2,8 +2,19 @@ defmodule AlibabaCloudKit do
   @moduledoc ~s"""
   A kit for Alibaba Cloud or Aliyun.
 
-  > This package is built by following my proposal -
-  > [Ship utilities for building platform SDKs](https://github.com/cozy-elixir/proposals/blob/main/ship-utilities-for-building-platform-sdks.md).
+  Note that this is not a one-stop, comprehensive SDK. As the name implies, it
+  is a kit for building your own minimalistic and focused SDK.
+
+    * Read more about this idea at [Ship utilities for building platform SDKs](https://github.com/cozy-elixir/proposals/blob/main/ship-utilities-for-building-platform-sdks.md).
+    * See examples at `examples/` directory in the source code.
+
+  Following are a few things worth knowing before you start.
+
+  ## What does this package provides?
+
+  Currently, this package mainly provides:
+
+    * signature helpers - `AlibabaCloudKit.Signature.*`
 
   ## API styles
 
@@ -22,7 +33,13 @@ defmodule AlibabaCloudKit do
     * OSS
       * Object Storage Service (OSS)
 
-  ## Check style of an API
+  The requests of RPC-style API can be signed by `AlibabaCloudKit.Signature.ACS3`.
+  The requests of OSS-style API can be signed by `AlibabaCloudKit.Signature.OSS4`.
+
+  > Personally, I don't have the need for ROA-style API for now. So, related
+  > signature helper isn't provided. PRs are welcome.
+
+  ## Check the style of an API
 
     1. Visit [OpenAPI Explorer](https://next.api.alibabacloud.com/).
     2. Search the API you wanna use.
