@@ -5,10 +5,6 @@
 
 A kit for Alibaba Cloud or Aliyun.
 
-## Notes
-
-This package is still in its early stages, so it may still undergo significant changes, potentially leading to breaking changes.
-
 ## Installation
 
 Add `:alibaba_cloud_kit` to the list of dependencies in `mix.exs`:
