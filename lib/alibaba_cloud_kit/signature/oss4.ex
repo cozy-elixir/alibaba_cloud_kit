@@ -28,6 +28,8 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
     ]
 
   alias HTTPSpec.Request
+  alias HTTPSpec.Request.QueryParams
+  alias HTTPSpec.Header
   alias AlibabaCloudKit.OSS.Object.PostPolicy
 
   @type access_key_id :: String.t()
@@ -191,8 +193,8 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
     }
 
     request
-    |> Request.put_header("host", request.host)
-    |> Request.put_header("date", datetime_in_rfc1123)
+    |> Header.put_header("host", request.host)
+    |> Header.put_header("date", datetime_in_rfc1123)
     |> put_signature(ctx)
   end
 
@@ -260,11 +262,11 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
     %{datetime: datetime} = ctx
 
     request
-    |> Request.put_new_lazy_header("content-md5", &build_content_md5(&1))
-    |> Request.put_new_lazy_header("content-type", &detect_content_type(&1))
-    |> Request.put_header("x-oss-date", datetime)
-    |> Request.put_header("x-oss-content-sha256", build_hashed_payload(request))
-    |> Request.put_new_lazy_header("authorization", fn request ->
+    |> Header.put_new_lazy_header("content-md5", &build_content_md5(&1))
+    |> Header.put_new_lazy_header("content-type", &detect_content_type(&1))
+    |> Header.put_header("x-oss-date", datetime)
+    |> Header.put_header("x-oss-content-sha256", build_hashed_payload(request))
+    |> Header.put_new_lazy_header("authorization", fn request ->
       additional_headers = build_additional_headers(request)
 
       content =
@@ -284,21 +286,21 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
     %{datetime: datetime} = ctx
 
     query_params =
-      Request.Query.decode(request.query)
-      |> Request.Query.put("x-oss-signature-version", @signature_version)
-      |> Request.Query.put("x-oss-credential", build_credential(ctx))
-      |> Request.Query.put("x-oss-date", datetime)
-      |> Request.Query.put_new_lazy("x-oss-expires", fn -> 3600 end)
-      |> Request.Query.put_new_lazy("x-oss-additional-headers", fn ->
+      QueryParams.decode(request.query)
+      |> QueryParams.put("x-oss-signature-version", @signature_version)
+      |> QueryParams.put("x-oss-credential", build_credential(ctx))
+      |> QueryParams.put("x-oss-date", datetime)
+      |> QueryParams.put_new_lazy("x-oss-expires", fn -> 3600 end)
+      |> QueryParams.put_new_lazy("x-oss-additional-headers", fn ->
         build_additional_headers(request)
       end)
 
-    request = Request.put_query(request, Request.Query.encode(query_params))
+    request = Request.put_query(request, QueryParams.encode(query_params))
 
     query =
       query_params
-      |> Request.Query.put_new_lazy("x-oss-signature", fn -> build_signature(request, ctx) end)
-      |> Request.Query.encode()
+      |> QueryParams.put_new_lazy("x-oss-signature", fn -> build_signature(request, ctx) end)
+      |> QueryParams.encode()
 
     Request.put_query(request, query)
   end
@@ -394,7 +396,7 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
 
   defp build_canonical_querystring(request) do
     request.query
-    |> Request.Query.decode()
+    |> QueryParams.decode()
     |> Map.fetch!(:internal)
     |> Enum.sort()
     |> Enum.map_join("&", fn

@@ -38,7 +38,7 @@ defmodule AlibabaCloudKit.MixProject do
   defp deps do
     [
       {:nimble_options, "~> 1.0"},
-      {:http_spec, "~> 2.1"},
+      {:http_spec, "~> 3.0"},
       {:jxon, "~> 0.1"},
       {:mime, "~> 2.0"},
       {:jason, "~> 1.0", only: [:dev, :test]},

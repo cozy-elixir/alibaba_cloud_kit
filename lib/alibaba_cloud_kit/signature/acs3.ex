@@ -28,6 +28,8 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
     ]
 
   alias HTTPSpec.Request
+  alias HTTPSpec.Request.QueryParams
+  alias HTTPSpec.Header
 
   @type access_key_id :: String.t()
   @type access_key_secret :: String.t()
@@ -136,11 +138,11 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
     }
 
     request
-    |> Request.put_header("host", request.host)
-    |> Request.put_header("x-acs-date", datetime)
-    |> Request.put_header("x-acs-content-sha256", build_hashed_payload(request))
-    |> Request.put_new_lazy_header("x-acs-signature-nonce", fn -> random_string() end)
-    |> Request.put_new_lazy_header("authorization", fn request ->
+    |> Header.put_header("host", request.host)
+    |> Header.put_header("x-acs-date", datetime)
+    |> Header.put_header("x-acs-content-sha256", build_hashed_payload(request))
+    |> Header.put_new_lazy_header("x-acs-signature-nonce", fn -> random_string() end)
+    |> Header.put_new_lazy_header("authorization", fn request ->
       build_authorization(request, ctx)
     end)
   end
@@ -200,7 +202,7 @@ defmodule AlibabaCloudKit.Signature.ACS3 do
 
   defp build_canonical_querystring(request) do
     request.query
-    |> Request.Query.decode()
+    |> QueryParams.decode()
     |> Map.fetch!(:internal)
     |> Enum.sort()
     |> URI.encode_query(:rfc3986)
