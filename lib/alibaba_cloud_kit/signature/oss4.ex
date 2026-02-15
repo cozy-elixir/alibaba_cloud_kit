@@ -272,7 +272,7 @@ defmodule AlibabaCloudKit.Signature.OSS4 do
       content =
         [
           "Credential=#{build_credential(ctx)}",
-          if(additional_headers != [], do: "AdditionalHeaders=#{additional_headers}", else: nil),
+          if(additional_headers != "", do: "AdditionalHeaders=#{additional_headers}", else: nil),
           "Signature=#{build_signature(request, ctx)}"
         ]
         |> Enum.reject(&(&1 == nil))
